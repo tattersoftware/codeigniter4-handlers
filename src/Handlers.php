@@ -2,6 +2,7 @@
 
 use CodeIgniter\Config\BaseConfig;
 use Tatter\Handlers\Exceptions\HandlersException;
+use Tatter\Handlers\Interfaces\HandlerInterface;
 
 class Handlers
 {
@@ -123,7 +124,7 @@ class Handlers
 				
 				// Get the instance and validate the necessary properties
 				$instance = new $class();
-				if (! isset($instance->attributes)):
+				if (! $instance instanceof HandlerInterface):
 					if ($this->config->silent):
 						$this->errors[] = lang('Handlers.invalidFormat', [$class]);
 						continue;

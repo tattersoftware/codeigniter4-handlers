@@ -16,49 +16,49 @@ class HandlersRegister extends BaseCommand
     	// Load the library
 		$lib = service('handlers');
 		
-		// Fetch all supported handlers
-		$handlers = $lib->getHandlers();
-		if (empty($handlers)):
-			CLI::write('ERROR: No handlers detected!', 'red');
+		// Fetch all supported configs
+		$configs = $lib->findConfigs();
+		if (empty($configs)):
+			CLI::write('ERROR: No handle config files detected!', 'red');
 			return;
 		endif;
 		
 		// Process each handler
-		foreach ($handlers as $handlerClass):
+		foreach ($configs as $configClass):
 		
-			// Scan for supported adapters
-			$adapters = $lib->getAdapters($handlerClass);
-			if (empty($adapters)):
-				CLI::write('No adapaters detected for handler: ' . $handlerClass, 'yellow');
+			// Scan for supported handlers
+			$handlers = $lib->findHandlers($configClass);
+			if (empty($handlers)):
+				CLI::write('No handlers detected for config file: ' . $configClass, 'yellow');
 				continue;
 			endif;
 			
-			// Get an instance of this handler's model
-			$handler = new $handlerClass();
-			$model = new $handler->{model}();
+			// Get an instance of the model
+			$config = config($configClass);
+			$model = new $config->model();
 			
-			// Load each adapter
-			foreach ($adapters as $adapterClass):
+			// Load each handler
+			foreach ($handlers as $handlerClass):
 
 				// Get the attributes from the adapter itself
-				$adapter = new $adapterClass();
-				$row = $adapter->attributes;
-				$row['class'] = $adapterClass;
+				$handler = new $handlerClass();
+				$row = $handler->attributes;
+				$row['class'] = $handlerClass;
 
 				// Check for an existing adapter registration
-				if ($adapterId = $model->where('uid', $row->uid)->first()):
+				if ($handlerId = $model->where('uid', $row['uid'])->first()):
 					// Update it
 					$model->where('uid', $row->uid)->update($row);
 				else:
 					// Create a new registration
-					$adapterId = $model->insert($row);
-					CLI::write("New adapter registered for {$handlerClass}: {$adapterClass}", 'green');
+					$handlerId = $model->insert($row);
+					CLI::write("New handler registered for {$configClass}: {$handlerClass}", 'green');
 				endif;
 				
 			endforeach;
 			
 		endforeach;
 		
-		$this->call('adapters:list');
+		$this->call('handlers:list');
 	}
 }
