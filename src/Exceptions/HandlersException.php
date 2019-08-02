@@ -15,8 +15,8 @@ class ExportsException extends \RuntimeException implements ExceptionInterface
 		return new static(lang('Handlers.missingClass', [$file, $class]));
 	}
 	
-	public static function forInvalidFormat($file)
+	public static function forInvalidFormat($class)
 	{
-		return new static(lang('Handlers.invalidFormat', [$file]));
+		return new static(lang('Handlers.invalidFormat', [$class]));
 	}
 }

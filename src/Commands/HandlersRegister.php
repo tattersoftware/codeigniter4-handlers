@@ -3,12 +3,12 @@
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 
-class AdaptersRegister extends BaseCommand
+class HandlersRegister extends BaseCommand
 {
     protected $group       = 'Handlers';
-    protected $name        = 'adapters:register';
-    protected $description = 'Locate supported handlers and add their adapters to the database';
-	protected $usage       = 'adapters:register';
+    protected $name        = 'handlers:register';
+    protected $description = 'Locate supported handlers and add them to the database';
+	protected $usage       = 'handlers:register';
 	protected $arguments   = [];
 
 	public function run(array $params = [])

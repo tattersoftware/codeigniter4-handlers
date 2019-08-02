@@ -11,7 +11,7 @@ class Services extends BaseService
 			return static::getSharedInstance('handlers', $config);
 
 		// If no config was injected then load one
-		$config = $config ?? config('Handlers');
+		$config = $config ?? config('HandlersConfig');
 		return new \Tatter\Handlers\Handlers($config);
 	}
 }

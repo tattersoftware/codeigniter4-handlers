@@ -10,7 +10,7 @@
 *
 ***/
 
-class Handlers extends \Tatter\Handlers\Config\Handlers
+class HandlersConfig extends \Tatter\Handlers\Config\HandlersConfig
 {
 	// whether to continue instead of throwing exceptions
 	public $silent = true;
@@ -18,6 +18,6 @@ class Handlers extends \Tatter\Handlers\Config\Handlers
 	// the session variable to check for a logged-in user ID
 	public $userSource = 'logged_in';
 	
-	// Relative directory in each namespace to check for supported handlers
-	public $directory = '/Handlers';
+	// Config file in each namespace to check for supported handlers
+	public $configFile = 'Handlers';
 }
