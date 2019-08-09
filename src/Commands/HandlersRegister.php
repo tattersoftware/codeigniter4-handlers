@@ -34,21 +34,21 @@ class HandlersRegister extends BaseCommand
 			endif;
 			
 			// Get an instance of the model
-			$config = config($configClass);
+			$config = new $configClass();
 			$model = new $config->model();
-			
+
 			// Load each handler
 			foreach ($handlers as $handlerClass):
 
-				// Get the attributes from the adapter itself
+				// Get the attributes from the handler itself
 				$handler = new $handlerClass();
 				$row = $handler->attributes;
 				$row['class'] = $handlerClass;
 
-				// Check for an existing adapter registration
-				if ($handlerId = $model->where('uid', $row['uid'])->first()):
+				// Check for an existing registration
+				if ($existing = $model->where('uid', $row['uid'])->first()):
 					// Update it
-					$model->where('uid', $row->uid)->update($row);
+					$model->update($existing->id, $row);
 				else:
 					// Create a new registration
 					$handlerId = $model->insert($row);
