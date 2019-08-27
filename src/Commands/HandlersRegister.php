@@ -19,7 +19,7 @@ class HandlersRegister extends BaseCommand
 		// Fetch all supported configs
 		$configs = $lib->findConfigs();
 		if (empty($configs)):
-			CLI::write('ERROR: No handle config files detected!', 'red');
+			CLI::write('WARNING: No handler config files detected!', 'yellow');
 			return;
 		endif;
 		
@@ -29,7 +29,15 @@ class HandlersRegister extends BaseCommand
 			// Scan for supported handlers
 			$handlers = $lib->findHandlers($configClass);
 			if (empty($handlers)):
-				CLI::write('No handlers detected for config file: ' . $configClass, 'yellow');
+				// Check for errors
+				if ($errors = $lib->getErrors()):
+					foreach ($errors as $error):
+						CLI::write($error, 'red');
+					endforeach;
+				else:
+					CLI::write('No handlers detected for config file: ' . $configClass, 'yellow');
+				endif;
+											
 				continue;
 			endif;
 			

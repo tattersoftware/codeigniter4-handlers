@@ -11,7 +11,7 @@ class BaseHandler
 	// Magic wrapper for getting attribute values
     public function __get(string $name)
     {
-		return $this->attributes[$name];
+		return $this->attributes[$name] ?? null;
     }
 	
 	public function setConfig(BaseConfig $config)
