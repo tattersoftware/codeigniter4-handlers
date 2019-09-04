@@ -1,9 +1,9 @@
-<?php namespace Tatter\Exports\Exceptions;
+<?php namespace Tatter\Handlers\Exceptions;
 
 use CodeIgniter\Exceptions\ExceptionInterface;
 use CodeIgniter\Exceptions\FrameworkException;
 
-class ExportsException extends \RuntimeException implements ExceptionInterface
+class HandlersException extends \RuntimeException implements ExceptionInterface
 {
 	public static function forLoadFail($file, $error)
 	{

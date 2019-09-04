@@ -19,18 +19,33 @@
 			"role": "Developer"
 		}
 	],
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/codeigniter4/CodeIgniter4"
+		}
+	],
 	"require": {
 		"php" : "^7.0"
 	},
 	"require-dev": {
-		"codeigniter4/framework": "dev-master"
+		"phpunit/phpunit" : "^7.0",
+		"mockery/mockery": "^1.0",
+		"mgatner/ci-module-tests": "^1.0",
+		"codeigniter4/codeigniter4": "dev-develop"
 	},
 	"autoload": {
 		"psr-4": {
 			"Tatter\\Handlers\\": "src"
 		}
 	},
+	"autoload-dev": {
+		"psr-4": {
+			"CIModuleTests\\Support\\": "tests/_support"
+		}
+	},
 	"scripts": {
+		"test": "phpunit",
 		"post-update-cmd": [
 			"composer dump-autoload"
 		]

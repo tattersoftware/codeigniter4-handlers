@@ -69,7 +69,7 @@ class Handlers
 			$configs[] = $class;
 		endforeach;
 		
-		return $configs;
+		return array_unique($configs);
 	}
 	
 	// Scan for any supported handlers for a given config
