@@ -1,5 +1,7 @@
 <?php namespace CIModuleTests\Support;
 
+use Tatter\Handlers\Config\Services;
+
 class DatabaseTestCase extends \CodeIgniter\Test\CIDatabaseTestCase
 {
     /**
@@ -14,7 +16,7 @@ class DatabaseTestCase extends \CodeIgniter\Test\CIDatabaseTestCase
      *
      * @var string
      */
-    protected $seed = 'CIModuleTests\Support\Database\Seeds\ExampleSeeder';
+    protected $seed = '';
 
     /**
      * The path to where we can find the test Seeds directory.
@@ -33,5 +35,7 @@ class DatabaseTestCase extends \CodeIgniter\Test\CIDatabaseTestCase
     public function setUp(): void
     {
         parent::setUp();
+        
+        $this->library = Services::handlers();
     }
 }

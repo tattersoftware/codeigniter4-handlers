@@ -31,7 +31,9 @@ class Handlers
 	// Return any error messages
 	public function getErrors()
 	{
-		return $this->errors;
+		$errors = $this->errors;
+		$this->errors = [];
+		return $errors;
 	}
 
 	// Scan namespaces for handler definition config files
