@@ -1,4 +1,4 @@
-<?php namespace CIModuleTests\Support\Factories;
+<?php namespace Tests\Support\Factories;
 
 use CodeIgniter\Events\Events;
 use Config\Services;
@@ -14,9 +14,8 @@ class BadHandler extends BaseHandler
 		'icon'       => 'fas fa-skull-crossbones',
 		'summary'    => 'This factory does not extend HandlerInterface as it should',
 	];
-		
+
 	public function process()
 	{
-
 	}
 }

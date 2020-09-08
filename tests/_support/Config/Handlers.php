@@ -1,6 +1,7 @@
-<?php namespace CIModuleTests\Support\Config;
+<?php namespace Tests\Support\Config;
 
 use CodeIgniter\Config\BaseConfig;
+use Tests\Support\Models\FactoryModel;
 
 class Handlers extends BaseConfig
 {
@@ -8,5 +9,5 @@ class Handlers extends BaseConfig
 	public $directory = 'Factories';
 	
 	// Model used to track handlers
-	public $model = '\CIModuleTests\Support\Models\FactoryModel';
+	public $model = FactoryModel::class;
 }

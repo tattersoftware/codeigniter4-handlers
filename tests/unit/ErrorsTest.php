@@ -1,6 +1,8 @@
 <?php
 
-class ErrorsTest extends CIModuleTests\Support\HandlerTestCase
+use Tests\Support\HandlerTestCase;
+
+class ErrorsTest extends HandlerTestCase
 {
 	public function setUp(): void
 	{
@@ -9,11 +11,11 @@ class ErrorsTest extends CIModuleTests\Support\HandlerTestCase
 
 	public function testSilentReturnErrors()
 	{
-		$configClass = 'CIModuleTests\Support\Config\Handlers';
+		$configClass = 'Tests\Support\Config\Handlers';
 		$handlers = $this->library->findHandlers($configClass);
 		
 		$errors = $this->library->getErrors();
 
-		$this->assertContains('Required properties missing from class: CIModuleTests\Support\Factories\BadHandler', $errors);
+		$this->assertContains('Required properties missing from class: Tests\Support\Factories\BadHandler', $errors);
 	}
 }

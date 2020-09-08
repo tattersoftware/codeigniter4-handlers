@@ -1,8 +1,8 @@
 <?php
 
-use \CIModuleTests\Support\Models\FactoryModel;
+use Tests\Support\Models\FactoryModel;
 
-class RegisterTest extends CIModuleTests\Support\DatabaseTestCase
+class RegisterTest extends Tests\Support\DatabaseTestCase
 {
 	public function setUp(): void
 	{
@@ -13,7 +13,7 @@ class RegisterTest extends CIModuleTests\Support\DatabaseTestCase
 	{
 		// Get an instance of the model
 		$model = new FactoryModel();
-		$handlerClass = '\CIModuleTests\Support\Factories\WidgetHandler';
+		$handlerClass = '\Tests\Support\Factories\WidgetHandler';
 		
 		// Get the attributes from the handler itself
 		$handler = new $handlerClass();

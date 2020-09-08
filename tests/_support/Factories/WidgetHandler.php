@@ -1,4 +1,4 @@
-<?php namespace CIModuleTests\Support\Factories;
+<?php namespace Tests\Support\Factories;
 
 use CodeIgniter\Events\Events;
 use Config\Services;
@@ -14,9 +14,8 @@ class WidgetHandler extends BaseHandler implements HandlerInterface
 		'icon'       => 'fas fa-puzzle-piece',
 		'summary'    => "The world's largest supplier of widgets!",
 	];
-		
+
 	public function process()
 	{
-
 	}
 }
