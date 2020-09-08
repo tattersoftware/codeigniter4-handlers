@@ -9,5 +9,5 @@ interface HandlerInterface
 	 *
 	 * @return mixed
 	 */
-	public function __get(string $name);
+	public function __get(string $key);
 }
