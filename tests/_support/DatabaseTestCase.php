@@ -1,8 +1,8 @@
-<?php namespace CIModuleTests\Support;
+<?php namespace Tests\Support;
 
-use Tatter\Handlers\Config\Services;
+use CodeIgniter\Test\CIDatabaseTestCase;
 
-class DatabaseTestCase extends \CodeIgniter\Test\CIDatabaseTestCase
+class DatabaseTestCase extends CIDatabaseTestCase
 {
     /**
      * Should the database be refreshed before each test?
@@ -30,12 +30,12 @@ class DatabaseTestCase extends \CodeIgniter\Test\CIDatabaseTestCase
      *
      * @var string
      */
-    protected $namespace = 'CIModuleTests\Support';
+    protected $namespace = 'Tests\Support';
 
     public function setUp(): void
     {
         parent::setUp();
         
-        $this->library = Services::handlers();
+        $this->library = service('handlers');
     }
 }

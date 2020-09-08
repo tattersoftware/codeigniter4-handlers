@@ -1,6 +1,8 @@
 <?php
 
-class LocatorTest extends CIModuleTests\Support\HandlerTestCase
+use Tests\Support\HandlerTestCase;
+
+class LocatorTest extends HandlerTestCase
 {
 	public function setUp(): void
 	{
@@ -16,13 +18,13 @@ class LocatorTest extends CIModuleTests\Support\HandlerTestCase
 
 	public function testFindHandlers()
 	{
-		$configClass = 'CIModuleTests\Support\Config\Handlers';
+		$configClass = 'Tests\Support\Config\Handlers';
 		
 		$handlers = $this->library->findHandlers($configClass);
 		
 		$this->assertCount(1, $handlers);
 		
 		$class = reset($handlers);
-		$this->assertEquals('CIModuleTests\Support\Factories\WidgetHandler', $class);
+		$this->assertEquals('Tests\Support\Factories\WidgetHandler', $class);
 	}
 }
