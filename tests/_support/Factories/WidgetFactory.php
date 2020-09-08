@@ -2,10 +2,10 @@
 
 use CodeIgniter\Events\Events;
 use Config\Services;
-use Tatter\Handlers\Handlers\BaseHandler;
+use Tatter\Handlers\BaseHandler;
 use Tatter\Handlers\Interfaces\HandlerInterface;
 
-class WidgetHandler extends BaseHandler implements HandlerInterface
+class WidgetFactory extends BaseHandler
 {
 	// Attributes for Tatter\Handlers
 	public $attributes = [
@@ -17,5 +17,6 @@ class WidgetHandler extends BaseHandler implements HandlerInterface
 
 	public function process()
 	{
+		return 'widget';
 	}
 }

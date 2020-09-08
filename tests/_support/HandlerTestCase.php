@@ -1,16 +1,30 @@
 <?php namespace Tests\Support;
 
-use CodeIgniter\Test\CIDatabaseTestCase;
+use CodeIgniter\Test\CIUnitTestCase;
+use Tatter\Handlers\Config\Handlers as HandlersConfig;
+use Tatter\Handlers\Handlers;
 
-class HandlerTestCase extends CIDatabaseTestCase
+class HandlerTestCase extends CIUnitTestCase
 {
-	// Instance of our Handlers library
-	protected $library;
+	/**
+	 * The configuration.
+	 *
+	 * @var HandlersConfig
+	 */
+	protected $config;
+
+	/**
+	 * Instance of our Handlers library.
+	 *
+	 * @var Handlers
+	 */
+	protected $handlers;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->library = service('handlers');
+		$this->config   = new HandlersConfig();
+        $this->handlers = new Handlers('Factories', $this->config);
     }
 }
