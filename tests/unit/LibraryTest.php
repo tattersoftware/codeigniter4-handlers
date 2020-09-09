@@ -19,25 +19,25 @@ class LibraryTest extends HandlerTestCase
 		$this->assertEquals($path, $result);
 	}
 
-	public function testWhereMergesFilters()
+	public function testWhereMergesCriteria()
 	{
 		$this->handlers->where(['group' => 'East']);
 
-		$result = $this->getPrivateProperty($this->handlers, 'filters');
+		$result = $this->getPrivateProperty($this->handlers, 'criteria');
 		$this->assertEquals($result, ['group' => 'East']);
 
 		$this->handlers->where(['uid' => 'pop']);
 
-		$result = $this->getPrivateProperty($this->handlers, 'filters');
+		$result = $this->getPrivateProperty($this->handlers, 'criteria');
 		$this->assertEquals($result, ['group' => 'East', 'uid' => 'pop']);
 	}
 
-	public function testResetClearsFilters()
+	public function testResetClearsCriteria()
 	{
 		$this->handlers->where(['group' => 'East']);
 		$this->handlers->reset();
 
-		$result = $this->getPrivateProperty($this->handlers, 'filters');
+		$result = $this->getPrivateProperty($this->handlers, 'criteria');
 		$this->assertEquals($result, []);
 	}
 
@@ -59,14 +59,12 @@ class LibraryTest extends HandlerTestCase
 		$this->assertNull($result);
 	}
 
-	public function testDiscoverHandlersRespectsLimit()
+	public function testFilterHandlersRespectsLimit()
 	{
 		$limit = 1;
 
-		$method = $this->getPrivateMethodInvoker($this->handlers, 'discoverHandlers');
-		$method($limit);
-
-		$result = $this->getPrivateProperty($this->handlers, 'discovered');
+		$method = $this->getPrivateMethodInvoker($this->handlers, 'filterHandlers');
+		$result = $method($limit);
 
 		$this->assertCount($limit, $result);
 	}
@@ -83,7 +81,7 @@ class LibraryTest extends HandlerTestCase
 		$this->assertEquals($expected, $result);
 	}
 
-	public function testAllRespectsFilters()
+	public function testAllRespectsCriteria()
 	{
 		$expected = [
 			'Tests\Support\Factories\WidgetFactory',
@@ -94,16 +92,16 @@ class LibraryTest extends HandlerTestCase
 		$this->assertEquals($expected, $result);
 	}
 
-	public function testAllResetsFilters()
+	public function testAllResetsCriteria()
 	{
 		$this->handlers->where(['uid' => 'widget'])->all();
 
-		$result = $this->getPrivateProperty($this->handlers, 'filters');
+		$result = $this->getPrivateProperty($this->handlers, 'criteria');
 
 		$this->assertEquals([], $result);
 	}
 
-	public function testFirstReturnsOne()
+	public function testFirstReturnsSingleton()
 	{
 		$expected = 'Tests\Support\Factories\PopFactory';
 
@@ -112,7 +110,7 @@ class LibraryTest extends HandlerTestCase
 		$this->assertEquals($expected, $result);
 	}
 
-	public function testFirstRespectsFilters()
+	public function testFirstRespectsCriteria()
 	{
 		$expected = [
 			'Tests\Support\Factories\WidgetFactory',
@@ -123,11 +121,11 @@ class LibraryTest extends HandlerTestCase
 		$this->assertEquals($expected, $result);
 	}
 
-	public function testFirstResetsFilters()
+	public function testFirstResetsCriteria()
 	{
 		$this->handlers->where(['uid' => 'widget'])->first();
 
-		$result = $this->getPrivateProperty($this->handlers, 'filters');
+		$result = $this->getPrivateProperty($this->handlers, 'criteria');
 
 		$this->assertEquals([], $result);
 	}
