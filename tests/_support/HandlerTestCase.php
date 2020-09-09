@@ -20,7 +20,7 @@ class HandlerTestCase extends CIUnitTestCase
 	 */
 	protected $handlers;
 
-	public function setUp(): void
+	protected function setUp(): void
 	{
 		parent::setUp();
 
@@ -30,7 +30,7 @@ class HandlerTestCase extends CIUnitTestCase
 		$this->handlers = new Handlers('Factories', $this->config);
 	}
 
-	public function tearDown(): void
+	protected function tearDown(): void
 	{
 		parent::tearDown();
 

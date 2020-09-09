@@ -2,42 +2,44 @@
 
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
+use Tatter\Handlers\Handlers;
 
 class HandlersList extends BaseCommand
 {
     protected $group       = 'Handlers';
     protected $name        = 'handlers:list';
-    protected $description = 'List all supported handlers';
+    protected $description = 'List all discovered handlers';
 	protected $usage       = 'handlers:list';
-	protected $arguments   = [];
 
 	public function run(array $params = [])
     {
     	// Load the library
-		$lib = service('handlers');
-		
-		// Fetch all config classes to search
-		$configs = $lib->findConfigs();
-		if (empty($configs)):
-			CLI::write('ERROR: No config files detected!', 'red');
+		$handlers = new Handlers();
+
+		// Make sure auto-discovery is enabled
+		if (empty($handlers->getConfig()->autoDiscover))
+		{
+			CLI::write('No paths are set for automatic discovery. See the config file for Tatter\Handlers.', 'yellow');
 			return;
-		endif;
-		
-		// Process each handler
-		foreach ($configs as $configClas):
-			CLI::write($configClas, 'black', 'light_gray');
-			
-			// Scan for supported handlers
-			$handlers = $lib->findHandlers($configClas);
-			if (empty($handlers)):
+		}
+
+		// Process each path
+		foreach ($handlers->getConfig()->autoDiscover as $path)
+		{
+			$handlers->setPath($path);
+			CLI::write($path, 'black', 'light_gray');
+
+			if (! $classes = $handlers->all())
+			{
 				CLI::write('No handlers detected.', 'yellow');
 				continue;
-			endif;
+			}
 			
-			// Display each handler
-			foreach ($handlers as $handlerClass):
-				CLI::write($handlerClass);
-			endforeach;
-		endforeach;
+			// Display each class
+			foreach ($classes as $class)
+			{
+				CLI::write($class);
+			}
+		}
 	}
 }

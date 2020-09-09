@@ -139,33 +139,4 @@ class LibraryTest extends HandlerTestCase
 
 		$this->assertEquals([], $result);
 	}
-
-	public function testUsesCache()
-	{
-		$class = 'Foo\Bar\Baz';
-
-		cache()->save('handlers-factories', [
-			$class => ['name' => 'foobar']
-		]);
-
-		$result = $this->handlers->first();
-
-		$this->assertEquals($class, $result);
-	}
-
-	public function testIgnoresCache()
-	{
-		$expected = 'Tests\Support\Factories\PopFactory';
-
-		$this->config->cacheDuration = null;
-		$handlers = new Handlers('Factories', $this->config);
-
-		cache()->save('handlers-factories', [
-			'Foo\Bar\Baz' => ['name' => 'foobar']
-		]);
-
-		$result = $this->handlers->first();
-
-		$this->assertEquals($expected, $result);
-	}
 }
