@@ -1,9 +1,19 @@
 <?php
 
+use Tatter\Handlers\Handlers;
+use Tatter\Handlers\Config\Handlers as HandlersConfig;
 use Tests\Support\HandlerTestCase;
 
 class LibraryTest extends HandlerTestCase
 {
+	public function testGetConfigReturnsConfig()
+	{
+		$result = $this->handlers->getConfig();
+
+		$this->assertInstanceOf(HandlersConfig::class, $result);
+		$this->assertEquals(MINUTE, $result->cacheDuration);
+	}
+
 	public function testGetPathReturnsPath()
 	{
 		$result = $this->handlers->getPath();
@@ -141,5 +151,21 @@ class LibraryTest extends HandlerTestCase
 		$result = $this->handlers->first();
 
 		$this->assertEquals($class, $result);
+	}
+
+	public function testIgnoresCache()
+	{
+		$expected = 'Tests\Support\Factories\PopFactory';
+
+		$this->config->cacheDuration = null;
+		$handlers = new Handlers('Factories', $this->config);
+
+		cache()->save('handlers-factories', [
+			'Foo\Bar\Baz' => ['name' => 'foobar']
+		]);
+
+		$result = $this->handlers->first();
+
+		$this->assertEquals($expected, $result);
 	}
 }

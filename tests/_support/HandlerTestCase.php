@@ -24,7 +24,9 @@ class HandlerTestCase extends CIUnitTestCase
 	{
 		parent::setUp();
 
-		$this->config   = new HandlersConfig();
+		$this->config = new HandlersConfig();
+		$this->config->cacheDuration = MINUTE;
+
 		$this->handlers = new Handlers('Factories', $this->config);
 	}
 

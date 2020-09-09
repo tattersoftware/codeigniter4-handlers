@@ -57,7 +57,17 @@ class Handlers
 	}
 
 	/**
-	 * Gets the search path.
+	 * Returns the curent configuration.
+	 *
+	 * @return HandlersConfig
+	 */
+	public function getConfig(): HandlersConfig
+	{
+		return $this->config;
+	}
+
+	/**
+	 * Returns the search path.
 	 *
 	 * @return string
 	 */
@@ -193,9 +203,10 @@ class Handlers
 		{
 			return $this;
 		}
-		
+
 		// Check the cache first
-		if ($this->discovered = $this->cache->get($this->cacheKey()))
+		$this->cacheRestore();		
+		if ($this->discovered !== null)
 		{
 			return $this;
 		}
@@ -304,7 +315,25 @@ class Handlers
 	 */
 	protected function cacheCommit(): self
 	{
-		$this->cache->save($this->cacheKey(), $this->discovered, $this->config->cacheDuration);
+		if ($this->config->cacheDuration !== null)
+		{
+			$this->cache->save($this->cacheKey(), $this->discovered, $this->config->cacheDuration);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Loads any discovered classes from the cache.
+	 *
+	 * @return $this
+	 */
+	protected function cacheRestore(): self
+	{
+		if ($this->config->cacheDuration !== null)
+		{
+			$this->discovered = $this->cache->get($this->cacheKey());
+		}
 
 		return $this;
 	}

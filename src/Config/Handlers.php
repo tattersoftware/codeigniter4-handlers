@@ -12,16 +12,17 @@ class Handlers extends BaseConfig
 	public $ignoredClasses = [];
 
     /**
-     * Paths to check during preemptive discovery.
+     * Paths to check during automatic discovery.
      *
      * @var array<string>
      */
-	public $discoveryPaths = [];
+	public $autoDiscover = [];
 
     /**
      * Number of seconds to cache discovered handlers.
+     * Null disables caching
      *
-     * @var int
+     * @var int|null
      */
 	public $cacheDuration = DAY;
 }
