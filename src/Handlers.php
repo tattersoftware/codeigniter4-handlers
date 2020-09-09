@@ -1,146 +1,352 @@
 <?php namespace Tatter\Handlers;
 
-use CodeIgniter\Config\BaseConfig;
-use Tatter\Handlers\Exceptions\HandlersException;
+use CodeIgniter\Cache\CacheInterface;
+use Config\Services;
+use Tatter\Handlers\Config\Handlers as HandlersConfig;
 use Tatter\Handlers\Interfaces\HandlerInterface;
 
 class Handlers
 {
 	/**
-	 * The configuration instance.
+	 * Path to search across namespaces.
 	 *
-	 * @var \Tatter\Handlers\Config\Handlers
+	 * @var string
+	 */
+	protected $path;
+
+	/**
+	 * The configuration.
+	 *
+	 * @var HandlersConfig
 	 */
 	protected $config;
-	
+
 	/**
-	 * Array error messages assigned on failure
+	 * The Cache handler instance.
 	 *
-	 * @var array
+	 * @var CacheInterface
 	 */
-	protected $errors;
-	
-	
-	// initiate library
-	public function __construct(BaseConfig $config)
-	{		
-		// Save the configuration
-		$this->config = $config;
-	}
-	
-	// Return any error messages
-	public function getErrors()
+	protected $cache;
+
+	/**
+	 * Array of attribute criteria.
+	 *
+	 * @var array<string, mixed>
+	 */
+	protected $criteria = [];
+
+	/**
+	 * Array of discovered HandlerInterface class names and their attributes.
+	 *
+	 * @var array<string, array>|null
+	 */
+	protected $discovered;
+
+	/**
+	 * Initializes the library.
+	 *
+	 * @param string $path
+	 * @param HandlersConfig|null $config
+	 * @param CacheInterface|null $cache
+	 */
+	public function __construct(string $path = '', HandlersConfig $config = null, CacheInterface $cache = null)
 	{
-		$errors = $this->errors;
-		$this->errors = [];
-		return $errors;
+		$this->path   = $path;
+		$this->config = $config ?? config('Handlers');
+		$this->cache  = $cache ?? service('cache');
 	}
 
-	// Scan namespaces for handler definition config files
-	public function findConfigs()
+	/**
+	 * Returns the curent configuration.
+	 *
+	 * @return HandlersConfig
+	 */
+	public function getConfig(): HandlersConfig
 	{
-		$configs = [];
-/*
-		// Get Config/Handlers.php from all namespaces
-		$locator = service('locator');
-		$files = $locator->search('Config/Handlers.php');
-*/		
-		// Get all namespaces from the autoloader
-		$namespaces = service('autoloader')->getNamespace();
-		
-		// Check each namespace
-		foreach ($namespaces as $namespace => $paths):
-			// Look for Config/Handlers.php
-			$config = config($namespace . '/' . $this->config->configFile);
-			if (empty($config)):
-				continue;
-			endif;
-			
-			// Validate the config file
-			$class = get_class($config);
-			if (! isset($config->directory, $config->model)):
-				if ($this->config->silent):
-					$this->errors[] = lang('Handlers.invalidFormat', [$class]);
+		return $this->config;
+	}
+
+	/**
+	 * Returns the search path.
+	 *
+	 * @return string
+	 */
+	public function getPath(): string
+	{
+		return $this->path;
+	}
+
+	/**
+	 * Sets the search path and resets discovery.
+	 *
+	 * @param string $path
+	 *
+	 * @return $this
+	 */
+	public function setPath(string $path): self
+	{
+		if ($path !== $this->path)
+		{
+			$this->path       = $path;
+			$this->discovered = null;
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Adds attribute criteria.
+	 *
+	 * @param array<string, mixed> $criteria
+	 *
+	 * @return $this
+	 */
+	public function where(array $criteria): self
+	{
+		$this->criteria = array_merge($this->criteria, $criteria);
+
+		return $this;
+	}
+
+	/**
+	 * Resets criteria between returns.
+	 *
+	 * @return $this
+	 */
+	public function reset(): self
+	{
+		$this->criteria = [];
+
+		return $this;
+	}
+
+	//--------------------------------------------------------------------
+
+	/**
+	 * Returns the first matched class. Short-circuits the namespace
+	 * traversal to optimize performance.
+	 *
+	 * @return string|null  The full class name, or null if none found
+	 */
+	public function first(): ?string
+	{
+		$class = $this->filterHandlers()[0] ?? null;
+		$this->reset();
+		return $class;
+	}
+
+	/**
+	 * Returns an array of all matched classes.
+	 *
+	 * @return array<string>
+	 */
+	public function all(): array
+	{
+		$classes = $this->filterHandlers();
+		$this->reset();
+		return $classes;
+	}
+
+	//--------------------------------------------------------------------
+
+	/**
+	 * Filters discovered classes by the criteria.
+	 *
+	 * @param int|null $limit  Limit on how many classes to match
+	 *
+	 * @return array<string>
+	 */
+	protected function filterHandlers(int $limit = null): array
+	{
+		$this->discoverHandlers();
+
+		// Make sure there is work to do
+		if (empty($this->criteria) || empty($this->discovered))
+		{
+			$classes = array_keys($this->discovered);
+
+			return $limit ? array_slice($classes, 0, $limit) : $classes;
+		}
+
+		$classes = [];
+		foreach ($this->discovered as $class => $attributes)
+		{
+			// Check each attribute against the criteria
+			foreach ($this->criteria as $key => $value)
+			{
+				if ($attributes[$key] !== $value)
+				{
+					continue 2;
+				}
+			}
+
+			// A match!
+			$classes[] = $class;
+
+			if ($limit && count($classes) >= $limit)
+			{
+				return $classes;
+			}
+		}
+
+		return $classes;
+	}
+
+	/**
+	 * Iterates through namespaces and finds HandlerInterfaces in $this->path.
+	 *
+	 * @return $this
+	 */
+	protected function discoverHandlers(): self
+	{
+		if ($this->discovered !== null)
+		{
+			return $this;
+		}
+
+		// Check the cache first
+		$this->cacheRestore();		
+		if ($this->discovered !== null)
+		{
+			return $this;
+		}
+
+		// Have to do this the hard way
+		$locator = Services::locator();
+
+		// Scan each namespace
+		$this->discovered = [];
+		foreach (Services::autoloader()->getNamespace() as $namespace => $paths)
+		{
+			// Check for files in $this->path for this namespace
+			foreach ($locator->listNamespaceFiles($namespace, $this->path) as $file)
+			{
+				// Try to get the class name
+				if (! $class = $this->getHandlerClass($file, $namespace))
+				{
 					continue;
-				else:
-					throw HandlersException::forInvalidFormat($class);
-				endif;
-			endif;
-			
-			// Save it
-			$configs[] = $class;
-		endforeach;
-		
-		return array_unique($configs);
-	}
-	
-	// Scan for any supported handlers for a given config
-	public function findHandlers($configClass)
-	{
-		$handlers = [];
-		
-		// Get an instance of the config
-		$config = new $configClass();
-
-		// Get all namespaces from the autoloader
-		$namespaces = service('autoloader')->getNamespace();
-		$locator    = service('locator');
-		
-		// Scan each namespace for handlers
-		foreach ($namespaces as $namespace => $paths):
-
-			// Get any files in the defined directory for this namespace
-			$files = $locator->listNamespaceFiles($namespace, $config->directory);
-			foreach ($files as $file):
-
-				// Skip non-PHP files
-				if (substr($file, -4) !== '.php'):
-					continue;
-				endif;
-				
-				// Get the namespaced class name
-				$name = basename($file, '.php');
-				$class = $namespace . '\\' . $config->directory . '\\' . $name;
-				
-				// Try to load the file
-				try {
-					require_once $file;
-				} catch (Exception $e) {
-					if ($this->config->silent):
-						$this->errors[] = lang('Handlers.loadFail', [$file, $e]);
-						continue;
-					else:
-						throw HandlersException::forLoadFail($file, $e);
-					endif;
 				}
 
-				// Validate the class
-				if (! class_exists($class, false)):
-					if ($this->config->silent):
-						$this->errors[] = lang('Handlers.missingClass', [$file, $class]);
-						continue;
-					else:
-						throw HandlersException::forMissingClass($file, $class);
-					endif;
-				endif;
+				// Make sure it is not an ignored class
+				if (in_array($class, $this->config->ignoredClasses))
+				{
+					continue;
+				}
 				
-				// Get the instance and validate the necessary properties
-				$instance = new $class();
-				if (! $instance instanceof HandlerInterface):
-					if ($this->config->silent):
-						$this->errors[] = lang('Handlers.invalidFormat', [$class]);
-						continue;
-					else:
-						throw HandlersException::forInvalidFormat($class);
-					endif;
-				endif;
-				
-				// Save it
-				$handlers[] = $class;
-				
-			endforeach;
-		endforeach;
-		
-		return $handlers;
+				// A match! Get the instance attributes
+				$attributes = (new $class())->toArray();
+
+				$this->discovered[$class] = $attributes;
+			}
+		}
+
+		// Cache the results
+		$this->cacheCommit();
+
+		return $this;
+	}
+
+	/**
+	 * Validates that a file path contains a HandlerInterface and
+	 * returns its full class name.
+	 *
+	 * @param string $file  Full path to the file in question
+	 * @param string $namespace  The file's namespace
+	 *
+	 * @return string|null  The fully-namespaced class
+	 */
+	public function getHandlerClass(string $file, string $namespace): ?string
+	{
+		// Skip non-PHP files
+		if (substr($file, -4) !== '.php')
+		{
+			return null;
+		}
+
+		// Try to load the file
+		try
+		{
+			include_once $file;
+		}
+		catch (\Throwable $e)
+		{
+			return null;
+		}
+
+		// Build the fully-namespaced class
+		$class = $namespace . '\\' . $this->path . '\\' . basename($file, '.php');
+
+		// Verify that the class is available
+		if (! class_exists($class, false))
+		{
+			return null;
+		}
+
+		// Verify the HandlerInterface
+		if (! $interfaces = class_implements($class))
+		{
+			return null;
+		}
+
+		if (! in_array(HandlerInterface::class, $interfaces))
+		{
+			return null;
+		}
+
+		return $class;
+	}
+
+	//--------------------------------------------------------------------
+
+	/**
+	 * Returns a standardized caching key for the current path.
+	 *
+	 * @return string
+	 */
+	protected function cacheKey(): string
+	{
+		return 'handlers-' . mb_url_title($this->path, '-', true);
+	}
+
+	/**
+	 * Commits discovered classes to the cache. Usually called by discoverHandlers().
+	 *
+	 * @return $this
+	 */
+	protected function cacheCommit(): self
+	{
+		if ($this->config->cacheDuration !== null)
+		{
+			$this->cache->save($this->cacheKey(), $this->discovered, $this->config->cacheDuration);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Loads any discovered classes from the cache.
+	 *
+	 * @return $this
+	 */
+	protected function cacheRestore(): self
+	{
+		if ($this->config->cacheDuration !== null)
+		{
+			$this->discovered = $this->cache->get($this->cacheKey());
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Removes discovered classes from the cache.
+	 *
+	 * @return $this
+	 */
+	public function cacheClear(): self
+	{
+		$this->cache->delete($this->cacheKey());
+
+		return $this;
 	}
 }

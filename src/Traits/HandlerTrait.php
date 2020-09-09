@@ -1,14 +1,6 @@
-<?php namespace Tatter\Handlers\Interfaces;
+<?php namespace Tatter\Handlers\Traits;
 
-/**
- * Interface for anything discoverable by Handlers. Ensures that
- * attributes can be properly read. In addition to these methods
- * the class must also support initialization without parameters.
- *
- * Note:
- * This interface will always be compatible with CodeIgniter\Entity.
- */
-interface HandlerInterface
+trait HandlerTrait
 {
 	/**
 	 * Magic method to allow retrieval of attributes.
@@ -17,7 +9,10 @@ interface HandlerInterface
 	 *
 	 * @return mixed
 	 */
-	public function __get(string $key);
+	public function __get(string $key)
+	{
+		return $this->attributes[$key] ?? null;
+	}
 
 	/**
 	 * Returns true if a property exists named $key.
@@ -26,7 +21,10 @@ interface HandlerInterface
 	 *
 	 * @return boolean
 	 */
-	public function __isset(string $key): bool;
+	public function __isset(string $key): bool
+	{
+		return isset($this->attributes[$key]);
+	}
 
 	/**
 	 * Returns a handler's attributes as an array.
@@ -39,5 +37,8 @@ interface HandlerInterface
 	 *
 	 * @return array
 	 */
-	public function toArray(bool $onlyChanged = false, bool $cast = true, bool $recursive = false): array;
+	public function toArray(bool $onlyChanged = false, bool $cast = true, bool $recursive = false): array
+	{
+		return $this->attributes;
+	}
 }

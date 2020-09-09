@@ -4,12 +4,12 @@ use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 use Tatter\Handlers\Handlers;
 
-class HandlersList extends BaseCommand
+class HandlersReset extends BaseCommand
 {
     protected $group       = 'Handlers';
-    protected $name        = 'handlers:list';
-    protected $description = 'List all discovered handlers';
-	protected $usage       = 'handlers:list';
+    protected $name        = 'handlers:reset';
+    protected $description = 'Clear cached versions of discovered handlers';
+	protected $usage       = 'handlers:reset';
 
 	public function run(array $params = [])
     {
@@ -27,19 +27,9 @@ class HandlersList extends BaseCommand
 		foreach ($handlers->getConfig()->autoDiscover as $path)
 		{
 			$handlers->setPath($path);
-			CLI::write($path, 'black', 'light_gray');
-
-			if (! $classes = $handlers->all())
-			{
-				CLI::write('No handlers detected.', 'yellow');
-				continue;
-			}
-			
-			// Display each class
-			foreach ($classes as $class)
-			{
-				CLI::write($class);
-			}
+			$handlers->cacheClear();
 		}
+
+		CLI::write('All cached handlers cleared!', 'green');
 	}
 }
