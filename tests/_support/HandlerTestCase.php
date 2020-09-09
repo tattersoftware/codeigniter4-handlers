@@ -20,11 +20,18 @@ class HandlerTestCase extends CIUnitTestCase
 	 */
 	protected $handlers;
 
-    public function setUp(): void
-    {
-        parent::setUp();
+	public function setUp(): void
+	{
+		parent::setUp();
 
 		$this->config   = new HandlersConfig();
-        $this->handlers = new Handlers('Factories', $this->config);
-    }
+		$this->handlers = new Handlers('Factories', $this->config);
+	}
+
+	public function tearDown(): void
+	{
+		parent::tearDown();
+
+		$this->handlers->cacheClear();
+	}
 }

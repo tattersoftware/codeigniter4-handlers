@@ -129,4 +129,17 @@ class LibraryTest extends HandlerTestCase
 
 		$this->assertEquals([], $result);
 	}
+
+	public function testUsesCache()
+	{
+		$class = 'Foo\Bar\Baz';
+
+		cache()->save('handlers-factories', [
+			$class => ['name' => 'foobar']
+		]);
+
+		$result = $this->handlers->first();
+
+		$this->assertEquals($class, $result);
+	}
 }

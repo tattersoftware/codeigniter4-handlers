@@ -294,7 +294,7 @@ class Handlers
 	 */
 	protected function cacheKey(): string
 	{
-		return 'handler-' . mb_url_title($this->path, '-', true);
+		return 'handlers-' . mb_url_title($this->path, '-', true);
 	}
 
 	/**
