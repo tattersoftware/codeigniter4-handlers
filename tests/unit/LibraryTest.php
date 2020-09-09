@@ -83,15 +83,6 @@ class LibraryTest extends HandlerTestCase
 		$this->assertEquals($expected, $result);
 	}
 
-	public function testFirstReturnsOne()
-	{
-		$expected = 'Tests\Support\Factories\PopFactory';
-
-		$result = $this->handlers->first();
-
-		$this->assertEquals($expected, $result);
-	}
-
 	public function testAllRespectsFilters()
 	{
 		$expected = [
@@ -99,6 +90,24 @@ class LibraryTest extends HandlerTestCase
 		];
 
 		$result = $this->handlers->where(['uid' => 'widget'])->all();
+
+		$this->assertEquals($expected, $result);
+	}
+
+	public function testAllResetsFilters()
+	{
+		$this->handlers->where(['uid' => 'widget'])->all();
+
+		$result = $this->getPrivateProperty($this->handlers, 'filters');
+
+		$this->assertEquals([], $result);
+	}
+
+	public function testFirstReturnsOne()
+	{
+		$expected = 'Tests\Support\Factories\PopFactory';
+
+		$result = $this->handlers->first();
 
 		$this->assertEquals($expected, $result);
 	}
@@ -112,5 +121,14 @@ class LibraryTest extends HandlerTestCase
 		$result = $this->handlers->where(['uid' => 'widget'])->all();
 
 		$this->assertEquals($expected, $result);
+	}
+
+	public function testFirstResetsFilters()
+	{
+		$this->handlers->where(['uid' => 'widget'])->first();
+
+		$result = $this->getPrivateProperty($this->handlers, 'filters');
+
+		$this->assertEquals([], $result);
 	}
 }

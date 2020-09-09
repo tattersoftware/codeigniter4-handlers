@@ -97,8 +97,9 @@ class Handlers
 	public function first(): ?string
 	{
 		$this->discoverHandlers(1);
-
-		return $this->discovered[0] ?? null;
+		$handler = $this->discovered[0] ?? null;
+		$this->reset();
+		return $handler;
 	}
 
 	/**
@@ -106,7 +107,9 @@ class Handlers
 	 */
 	public function all(): array
 	{
-		return $this->discoverHandlers()->discovered;
+		$handlers = $this->discoverHandlers()->discovered;
+		$this->reset();
+		return $handlers;
 	}
 
 	/**
