@@ -18,4 +18,99 @@ class LibraryTest extends HandlerTestCase
 
 		$this->assertEquals($path, $result);
 	}
+
+	public function testWhereMergesFilters()
+	{
+		$this->handlers->where(['group' => 'East']);
+
+		$result = $this->getPrivateProperty($this->handlers, 'filters');
+		$this->assertEquals($result, ['group' => 'East']);
+
+		$this->handlers->where(['uid' => 'pop']);
+
+		$result = $this->getPrivateProperty($this->handlers, 'filters');
+		$this->assertEquals($result, ['group' => 'East', 'uid' => 'pop']);
+	}
+
+	public function testResetClearsFilters()
+	{
+		$this->handlers->where(['group' => 'East']);
+		$this->handlers->reset();
+
+		$result = $this->getPrivateProperty($this->handlers, 'filters');
+		$this->assertEquals($result, []);
+	}
+
+	public function testGetHandlerClassReturnsClass()
+	{
+		$expected = 'Tests\Support\Factories\WidgetFactory';
+
+		$file   = realpath(SUPPORTPATH . 'Factories/WidgetFactory.php');
+		$result = $this->handlers->getHandlerClass($file, 'Tests\Support');
+
+		$this->assertEquals($expected, $result);
+	}
+
+	public function testGetHandlerClassFails()
+	{
+		$file   = realpath(SUPPORTPATH . 'Factories/WidgetFactory.php');
+		$result = $this->handlers->getHandlerClass($file, 'Foo\Bar');
+
+		$this->assertNull($result);
+	}
+
+	public function testDiscoverHandlersRespectsLimit()
+	{
+		$limit = 1;
+
+		$method = $this->getPrivateMethodInvoker($this->handlers, 'discoverHandlers');
+		$method($limit);
+
+		$result = $this->getPrivateProperty($this->handlers, 'discovered');
+
+		$this->assertCount($limit, $result);
+	}
+
+	public function testAllDiscoversAll()
+	{
+		$expected = [
+			'Tests\Support\Factories\PopFactory',
+			'Tests\Support\Factories\WidgetFactory',
+		];
+
+		$result = $this->handlers->all();
+
+		$this->assertEquals($expected, $result);
+	}
+
+	public function testFirstReturnsOne()
+	{
+		$expected = 'Tests\Support\Factories\PopFactory';
+
+		$result = $this->handlers->first();
+
+		$this->assertEquals($expected, $result);
+	}
+
+	public function testAllRespectsFilters()
+	{
+		$expected = [
+			'Tests\Support\Factories\WidgetFactory',
+		];
+
+		$result = $this->handlers->where(['uid' => 'widget'])->all();
+
+		$this->assertEquals($expected, $result);
+	}
+
+	public function testFirstRespectsFilters()
+	{
+		$expected = [
+			'Tests\Support\Factories\WidgetFactory',
+		];
+
+		$result = $this->handlers->where(['uid' => 'widget'])->all();
+
+		$this->assertEquals($expected, $result);
+	}
 }

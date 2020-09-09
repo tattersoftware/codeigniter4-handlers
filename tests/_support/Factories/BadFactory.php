@@ -6,10 +6,10 @@ class BadFactory
 
 	// Attributes for Tatter\Handlers
 	public $attributes = [
-		'name'       => 'Bad Factory',
-		'uid'        => 'bad',
-		'icon'       => 'fas fa-skull-crossbones',
-		'summary'    => 'This factory does not implement HandlerInterface as it should',
+		'group'   => 'South',
+		'name'    => 'Bad Factory',
+		'uid'     => 'bad',
+		'summary' => 'This factory does not implement HandlerInterface as it should',
 	];
 
 	public function process()

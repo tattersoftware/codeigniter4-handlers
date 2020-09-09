@@ -5,13 +5,6 @@ use CodeIgniter\Config\BaseConfig;
 class Handlers extends BaseConfig
 {
     /**
-     * Whether to continue instead of throwing exceptions.
-     *
-     * @var bool
-     */
-	public $silent = true;
-
-    /**
      * Classes to ignore across all handlers.
      *
      * @var array<string>

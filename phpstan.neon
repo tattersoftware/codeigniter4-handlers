@@ -4,6 +4,8 @@ parameters:
 	paths:
 		- src
 		- tests
+	ignoreErrors:
+		- '#Constant SUPPORTPATH not found#'
 	bootstrapFiles:
 		- phpstan-bootstrap.php
 	scanDirectories:

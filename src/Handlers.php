@@ -85,6 +85,9 @@ class Handlers
 		return $this;
 	}
 
+	//--------------------------------------------------------------------
+
+
 	/**
 	 * Returns the first matched class. Short-circuits the namespace
 	 * traversal to optimize performance.
@@ -187,7 +190,7 @@ class Handlers
 		// Try to load the file
 		try
 		{
-			include $file;
+			include_once $file;
 		}
 		catch (\Throwable $e)
 		{
@@ -204,7 +207,12 @@ class Handlers
 		}
 
 		// Verify the HandlerInterface
-		if (! is_a($class, HandlerInterface::class))
+		if (! $interfaces = class_implements($class))
+		{
+			return null;
+		}
+
+		if (! in_array(HandlerInterface::class, $interfaces))
 		{
 			return null;
 		}
