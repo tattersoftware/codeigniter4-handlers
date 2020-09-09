@@ -4,7 +4,7 @@ use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
 use Tatter\Handlers\Handlers;
 
-class HandlersList extends BaseCommand
+class HandlersReset extends BaseCommand
 {
     protected $group       = 'Handlers';
     protected $name        = 'handlers:reset';
