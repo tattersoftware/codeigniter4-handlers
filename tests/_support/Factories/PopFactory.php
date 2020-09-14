@@ -18,4 +18,9 @@ class PopFactory implements HandlerInterface
 	{
 		return 'pop';
 	}
+
+	public function register()
+	{
+		session()->set(['didRegister' => true]);
+	}
 }

@@ -139,4 +139,11 @@ class LibraryTest extends HandlerTestCase
 
 		$this->assertEquals([], $result);
 	}
+
+	public function testRegisterCallsHandlerRegister()
+	{
+		$this->handlers->register();
+
+		$this->assertEquals(true, session('didRegister'));
+	}
 }

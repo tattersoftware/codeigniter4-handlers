@@ -147,6 +147,38 @@ class Handlers
 		return $classes;
 	}
 
+	/**
+	 * Iterates through discovered handlers and attempts to register them.
+	 *
+	 * @return array<string>  Array of newly-registered classes
+	 */
+	public function register(): array
+	{
+		$this->discoverHandlers();
+
+		if (empty($this->discovered))
+		{
+			return [];
+		}
+
+		service('timer')->start('Register ' . $this->path);
+
+		$classes = [];
+		foreach ($this->discovered as $class => $attributes)
+		{
+			$instance = new $class();
+
+			if (is_callable([$instance, 'register']) && $instance->register())
+			{
+				$classes[] = $class;
+			}
+		}
+
+		service('timer')->stop('Discover ' . $this->path);
+
+		return $classes;
+	}
+
 	//--------------------------------------------------------------------
 
 	/**
@@ -211,6 +243,8 @@ class Handlers
 			return $this;
 		}
 
+		service('timer')->start('Discover ' . $this->path);
+
 		// Have to do this the hard way
 		$locator = Services::locator();
 
@@ -242,6 +276,8 @@ class Handlers
 
 		// Cache the results
 		$this->cacheCommit();
+
+		service('timer')->stop('Discover ' . $this->path);
 
 		return $this;
 	}
