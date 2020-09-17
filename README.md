@@ -106,6 +106,9 @@ foreach ($handlers->all() as $class)
 
 // ... or get a single handler by one of its attributes
 $class = $handlers->where(['color' => 'red'])->first();
+
+// ... or by specifying its name
+$class = $handlers->named('FancyHandler');
 (new $class)->display();
 ```
 
