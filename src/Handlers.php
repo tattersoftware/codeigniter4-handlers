@@ -94,6 +94,8 @@ class Handlers
 		return $this;
 	}
 
+	//--------------------------------------------------------------------
+
 	/**
 	 * Adds attribute criteria.
 	 *
@@ -146,6 +148,53 @@ class Handlers
 		$this->reset();
 		return $classes;
 	}
+
+	/**
+	 * Returns a handler with a given name. Ignores filters.
+	 * Searches: attribute "name" or "uid", namespaced class, and short class name.
+	 *
+	 * @param string $name  The name of the handler
+	 *
+	 * @return string|null  The full class name, or null if none found
+	 */
+	public function named(string $name): ?string
+	{
+		$this->discoverHandlers();
+
+		$name = trim($name, '\\ ');
+
+		foreach ($this->discovered as $class => $attributes)
+		{
+			// Check the namespaced class
+			if ($class === $name)
+			{
+				return $class;
+			}
+
+			// Check the attributes
+			if (isset($attributes['name']) && $attributes['name'] === $name)
+			{
+				return $class;
+			}
+			if (isset($attributes['uid']) && $attributes['uid'] === $name)
+			{
+				return $class;
+			}
+
+			// Check the class shortname
+			if ($pos = strrpos($class, '\\'))
+			{
+				if (substr($class, $pos + 1) === $name)
+				{
+					return $class;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	//--------------------------------------------------------------------
 
 	/**
 	 * Iterates through discovered handlers and attempts to register them.
