@@ -6,7 +6,7 @@ use Tatter\Handlers\Handlers;
 
 class HandlersRegister extends BaseCommand
 {
-    protected $group       = 'Handlers';
+    protected $group       = 'Housekeeping';
     protected $name        = 'handlers:register';
     protected $description = 'Regsiter all discovered handlers';
 	protected $usage       = 'handlers:register';

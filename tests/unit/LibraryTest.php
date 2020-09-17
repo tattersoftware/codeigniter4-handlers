@@ -79,67 +79,6 @@ class LibraryTest extends HandlerTestCase
 		$this->assertCount($limit, $result);
 	}
 
-	public function testAllDiscoversAll()
-	{
-		$expected = [
-			'Tests\Support\Factories\PopFactory',
-			'Tests\Support\Factories\WidgetFactory',
-		];
-
-		$result = $this->handlers->all();
-
-		$this->assertEquals($expected, $result);
-	}
-
-	public function testAllRespectsCriteria()
-	{
-		$expected = [
-			'Tests\Support\Factories\WidgetFactory',
-		];
-
-		$result = $this->handlers->where(['uid' => 'widget'])->all();
-
-		$this->assertEquals($expected, $result);
-	}
-
-	public function testAllResetsCriteria()
-	{
-		$this->handlers->where(['uid' => 'widget'])->all();
-
-		$result = $this->getPrivateProperty($this->handlers, 'criteria');
-
-		$this->assertEquals([], $result);
-	}
-
-	public function testFirstReturnsSingleton()
-	{
-		$expected = 'Tests\Support\Factories\PopFactory';
-
-		$result = $this->handlers->first();
-
-		$this->assertEquals($expected, $result);
-	}
-
-	public function testFirstRespectsCriteria()
-	{
-		$expected = [
-			'Tests\Support\Factories\WidgetFactory',
-		];
-
-		$result = $this->handlers->where(['uid' => 'widget'])->all();
-
-		$this->assertEquals($expected, $result);
-	}
-
-	public function testFirstResetsCriteria()
-	{
-		$this->handlers->where(['uid' => 'widget'])->first();
-
-		$result = $this->getPrivateProperty($this->handlers, 'criteria');
-
-		$this->assertEquals([], $result);
-	}
-
 	public function testRegisterCallsHandlerRegister()
 	{
 		$this->handlers->register();
