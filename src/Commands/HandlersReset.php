@@ -6,7 +6,7 @@ use Tatter\Handlers\Handlers;
 
 class HandlersReset extends BaseCommand
 {
-    protected $group       = 'Handlers';
+    protected $group       = 'Housekeeping';
     protected $name        = 'handlers:reset';
     protected $description = 'Clear cached versions of discovered handlers';
 	protected $usage       = 'handlers:reset';
