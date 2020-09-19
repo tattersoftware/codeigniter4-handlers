@@ -18,6 +18,28 @@ class SearchTest extends HandlerTestCase
 		$this->assertEquals($expected, $result);
 	}
 
+	public function testWhereUsesOperators()
+	{
+		$expected = ['Tests\Support\Factories\WidgetFactory'];
+
+		$result = $this->handlers
+			->where(['cost >' => 5])
+			->findAll();
+
+		$this->assertEquals($expected, $result);
+	}
+
+	public function testWhereSupportsCsv()
+	{
+		$expected = ['Tests\Support\Factories\WidgetFactory'];
+
+		$result = $this->handlers
+			->where(['list has' => 'three'])
+			->findAll();
+
+		$this->assertEquals($expected, $result);
+	}
+
 	public function testWhereMissingAttribute()
 	{
 		$result = $this->handlers

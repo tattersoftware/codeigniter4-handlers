@@ -344,8 +344,16 @@ class Handlers
 						$test = $attributes[$key] === $value;
 					break;
 
+					case '>':
+						$test = $attributes[$key] > $value;						
+					break;
+
 					case '>=':
 						$test = $attributes[$key] >= $value;						
+					break;
+
+					case '<':
+						$test = $attributes[$key] < $value;
 					break;
 
 					case '<=':

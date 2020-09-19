@@ -10,6 +10,8 @@ class WidgetFactory extends BaseHandler
 		'name'    => 'Widget Plant',
 		'uid'     => 'widget',
 		'summary' => "The world's largest supplier of widgets!",
+		'cost'    => 10,
+		'list'    => 'one,two,three,four',
 	];
 
 	public function process()
