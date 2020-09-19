@@ -12,6 +12,8 @@ class PopFactory implements HandlerInterface
 		'name'    => 'Pop Factory',
 		'uid'     => 'pop',
 		'summary' => 'Makes pop',
+		'cost'    => 1,
+		'list'    => 'five,six',
 	];
 
 	public function process()
