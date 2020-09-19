@@ -29,25 +29,30 @@ class LibraryTest extends HandlerTestCase
 		$this->assertEquals($path, $result);
 	}
 
-	public function testWhereMergesCriteria()
+	public function testWhereCombinesFilters()
 	{
 		$this->handlers->where(['group' => 'East']);
 
-		$result = $this->getPrivateProperty($this->handlers, 'criteria');
-		$this->assertEquals($result, ['group' => 'East']);
+		$result = $this->getPrivateProperty($this->handlers, 'filters');
+		$this->assertEquals($result, [
+			['group', '==', 'East', true],
+		]);
 
 		$this->handlers->where(['uid' => 'pop']);
 
-		$result = $this->getPrivateProperty($this->handlers, 'criteria');
-		$this->assertEquals($result, ['group' => 'East', 'uid' => 'pop']);
+		$result = $this->getPrivateProperty($this->handlers, 'filters');
+		$this->assertEquals($result, [
+			['group', '==', 'East', true],
+			['uid', '==', 'pop', true],
+		]);
 	}
 
-	public function testResetClearsCriteria()
+	public function testResetClearsFilters()
 	{
 		$this->handlers->where(['group' => 'East']);
 		$this->handlers->reset();
 
-		$result = $this->getPrivateProperty($this->handlers, 'criteria');
+		$result = $this->getPrivateProperty($this->handlers, 'filters');
 		$this->assertEquals($result, []);
 	}
 

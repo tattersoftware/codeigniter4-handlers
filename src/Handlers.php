@@ -29,11 +29,11 @@ class Handlers
 	protected $cache;
 
 	/**
-	 * Array of attribute criteria.
+	 * Array of filters.
 	 *
-	 * @var array<string, mixed>
+	 * @var array of [key, operator, value, combine]
 	 */
-	protected $criteria = [];
+	protected $filters = [];
 
 	/**
 	 * Array of discovered HandlerInterface class names and their attributes.
@@ -57,7 +57,7 @@ class Handlers
 	}
 
 	/**
-	 * Returns the curent configuration.
+	 * Returns the current configuration.
 	 *
 	 * @return HandlersConfig
 	 */
@@ -97,7 +97,7 @@ class Handlers
 	//--------------------------------------------------------------------
 
 	/**
-	 * Adds attribute criteria.
+	 * Adds attribute filters.
 	 *
 	 * @param array<string, mixed> $criteria
 	 *
@@ -105,19 +105,33 @@ class Handlers
 	 */
 	public function where(array $criteria): self
 	{
-		$this->criteria = array_merge($this->criteria, $criteria);
+		$this->parseCriteria($criteria, true);
 
 		return $this;
 	}
 
 	/**
-	 * Resets criteria between returns.
+	 * Adds attribute filters that do not combine.
+	 *
+	 * @param array<string, mixed> $criteria
+	 *
+	 * @return $this
+	 */
+	public function orWhere(array $criteria): self
+	{
+		$this->parseCriteria($criteria, false);
+
+		return $this;
+	}
+
+	/**
+	 * Resets filters between returns.
 	 *
 	 * @return $this
 	 */
 	public function reset(): self
 	{
-		$this->criteria = [];
+		$this->filters = [];
 
 		return $this;
 	}
@@ -142,7 +156,7 @@ class Handlers
 	 *
 	 * @return array<string>
 	 */
-	public function all(): array
+	public function findAll(): array
 	{
 		$classes = $this->filterHandlers();
 		$this->reset();
@@ -157,7 +171,7 @@ class Handlers
 	 *
 	 * @return string|null  The full class name, or null if none found
 	 */
-	public function named(string $name): ?string
+	public function find(string $name): ?string
 	{
 		$this->discoverHandlers();
 
@@ -197,6 +211,58 @@ class Handlers
 	//--------------------------------------------------------------------
 
 	/**
+	 * Returns an array of all matched classes.
+	 *
+	 * @return array<string>
+	 * @deprecated Use findAll()
+	 */
+	public function all(): array
+	{
+		return $this->findAll();
+	}
+
+	/**
+	 * Returns a handler with a given name. Ignores filters.
+	 * Searches: attribute "name" or "uid", namespaced class, and short class name.
+	 *
+	 * @param string $name  The name of the handler
+	 *
+	 * @return string|null  The full class name, or null if none found
+	 * @deprecated Use find()
+	 */
+	public function named(string $name): ?string
+	{
+		return $this->find($name);
+	}
+
+	//--------------------------------------------------------------------
+
+	/**
+	 * Parses "where" $criteria and adds to $filters
+	 *
+	 * @param array $criteria  Array of 'key [operator]' => 'value'
+	 * @param bool $combine    Whether the resulting filter should be combined with others
+	 */
+	protected function parseCriteria(array $criteria, bool $combine): void
+	{
+		foreach ($criteria as $key => $value)
+		{
+			// Check for an operator
+			$key = trim($key);
+			if (strpos($key, ' '))
+			{
+				list($key, $operator) = explode(' ', $key);
+			}
+			else
+			{
+				$operator = '==';
+			}
+
+			$this->filters[] = [$key, $operator, $value, $combine];
+		}
+	}
+
+	/**
 	 * Iterates through discovered handlers and attempts to register them.
 	 *
 	 * @return array<string>  Array of newly-registered classes
@@ -231,18 +297,19 @@ class Handlers
 	//--------------------------------------------------------------------
 
 	/**
-	 * Filters discovered classes by the criteria.
+	 * Filters discovered classes by the defined criteria.
 	 *
 	 * @param int|null $limit  Limit on how many classes to match
 	 *
 	 * @return array<string>
+	 * @throws \RuntimeException
 	 */
 	protected function filterHandlers(int $limit = null): array
 	{
 		$this->discoverHandlers();
 
 		// Make sure there is work to do
-		if (empty($this->criteria) || empty($this->discovered))
+		if (empty($this->filters) || empty($this->discovered))
 		{
 			$classes = array_keys($this->discovered);
 
@@ -252,21 +319,67 @@ class Handlers
 		$classes = [];
 		foreach ($this->discovered as $class => $attributes)
 		{
-			// Check each attribute against the criteria
-			foreach ($this->criteria as $key => $value)
+			$result = true;
+
+			// Check each attribute against the filters
+			foreach ($this->filters as $filter)
 			{
-				if ($attributes[$key] !== $value)
+				// Split out the array to make it easier to read
+				list($key, $operator, $value, $combine) = $filter;
+
+				if (! isset($attributes[$key]))
 				{
-					continue 2;
+					$result = false;
+					continue;
 				}
+
+				switch ($operator)
+				{
+					case '==':
+					case '=':
+						$test = $attributes[$key] == $value;
+					break;
+
+					case '===':
+						$test = $attributes[$key] === $value;
+					break;
+
+					case '>=':
+						$test = $attributes[$key] >= $value;						
+					break;
+
+					case '<=':
+						$test = $attributes[$key] <= $value;
+					break;
+
+					// Assumes the attribute is a CSV
+					case 'has':
+						$test = in_array($value, explode(',', $attributes[$key]));
+					break;
+
+					default:
+						throw new \RuntimeException($operator . ' is not a vald criteria operator');
+				}
+
+				// If this filter was sufficient on its own then skip the rest of the filters
+				if ($test && ! $combine)
+				{
+					$result = true;
+					break;
+				}
+
+				$result = $result && $test;
 			}
 
-			// A match!
-			$classes[] = $class;
-
-			if ($limit && count($classes) >= $limit)
+			// Check for a match
+			if ($result)
 			{
-				return $classes;
+				$classes[] = $class;
+
+				if ($limit && count($classes) >= $limit)
+				{
+					return $classes;
+				}
 			}
 		}
 
