@@ -4,13 +4,12 @@ parameters:
 	paths:
 		- src
 		- tests
-	ignoreErrors:
-		- '#Constant SUPPORTPATH not found#'
 	bootstrapFiles:
-		- phpstan-bootstrap.php
+		- vendor/codeigniter4/codeigniter4/system/Test/bootstrap.php
 	scanDirectories:
 		- vendor/codeigniter4/codeigniter4/system/Helpers
 	dynamicConstantNames:
 		- ENVIRONMENT
 		- CI_DEBUG
-	treatPhpDocTypesAsCertain: false
+	ignoreErrors:
+		- '#Call to an undefined static method Config\\Services::handlers\(\)#'
