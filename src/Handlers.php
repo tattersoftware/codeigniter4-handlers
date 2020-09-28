@@ -356,7 +356,7 @@ class Handlers
 				{
 					case '==':
 					case '=':
-						$test = $attributes[$key] === $value;
+						$test = $attributes[$key] == $value;
 					break;
 
 					case '===':
@@ -365,11 +365,11 @@ class Handlers
 
 					case '>':
 						$test = $attributes[$key] > $value;
-break;
+					break;
 
 					case '>=':
 						$test = $attributes[$key] >= $value;
-break;
+					break;
 
 					case '<':
 						$test = $attributes[$key] < $value;
@@ -426,7 +426,9 @@ break;
 		}
 
 		// Check the cache first
-		$this->cacheRestore();                if ($this->discovered !== null)
+		$this->cacheRestore();
+
+		if ($this->discovered !== null)
 		{
 			return $this;
 		}

@@ -26,8 +26,8 @@ class CacheTest extends HandlerTestCase
 		$handlers                    = new Handlers('Factories', $this->config);
 
 		cache()->save('handlers-factories', [
-				   'Foo\Bar\Baz' => ['name' => 'foobar'],
-			   ]);
+			'Foo\Bar\Baz' => ['name' => 'foobar'],
+		]);
 
 		$result = $this->handlers->first();
 
