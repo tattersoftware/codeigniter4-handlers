@@ -4,25 +4,25 @@ use CodeIgniter\Config\BaseConfig;
 
 class Handlers extends BaseConfig
 {
-    /**
-     * Classes to ignore across all handlers.
-     *
-     * @var array<string>
-     */
+	/**
+	 * Classes to ignore across all handlers.
+	 *
+	 * @var array<string>
+	 */
 	public $ignoredClasses = [];
 
-    /**
-     * Paths to check during automatic discovery.
-     *
-     * @var array<string>
-     */
+	/**
+	 * Paths to check during automatic discovery.
+	 *
+	 * @var array<string>
+	 */
 	public $autoDiscover = [];
 
-    /**
-     * Number of seconds to cache discovered handlers.
-     * Null disables caching
-     *
-     * @var int|null
-     */
+	/**
+	 * Number of seconds to cache discovered handlers.
+	 * Null disables caching
+	 *
+	 * @var integer|null
+	 */
 	public $cacheDuration = DAY;
 }

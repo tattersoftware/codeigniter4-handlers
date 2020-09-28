@@ -21,9 +21,9 @@ class HelperTest extends HandlerTestCase
 
 	public function testHelperRetainsPath()
 	{
-		$path   = 'Marmalade';
+		$path = 'Marmalade';
 		handlers($path);
-		
+
 		$result = handlers()->getPath();
 
 		$this->assertEquals($path, $result);

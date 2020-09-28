@@ -137,16 +137,46 @@ class SearchTest extends HandlerTestCase
 	public function provideNames()
 	{
 		return [
-			['',                                        false],
-			[' ',                                       false],
-			['pop',                                     true],
-			['PopFactory',                              true],
-			['Pop Factory',                             true],
-			['Bad Factory',                             false],
-			['Not A Factory',                           false],
-			['Tests\\Support\\Factories',               false],
-			['Tests\\Support\Factories\\PopFactory',    true],
-			['\\Tests\\Support\\Factories\\PopFactory', true],
+			[
+				'',
+				false,
+			],
+			[
+				' ',
+				false,
+			],
+			[
+				'pop',
+				true,
+			],
+			[
+				'PopFactory',
+				true,
+			],
+			[
+				'Pop Factory',
+				true,
+			],
+			[
+				'Bad Factory',
+				false,
+			],
+			[
+				'Not A Factory',
+				false,
+			],
+			[
+				'Tests\\Support\\Factories',
+				false,
+			],
+			[
+				'Tests\\Support\Factories\\PopFactory',
+				true,
+			],
+			[
+				'\\Tests\\Support\\Factories\\PopFactory',
+				true,
+			],
 		];
 	}
 }

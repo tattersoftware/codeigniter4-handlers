@@ -6,14 +6,14 @@ use Tatter\Handlers\Handlers;
 
 class HandlersList extends BaseCommand
 {
-    protected $group       = 'Housekeeping';
-    protected $name        = 'handlers:list';
-    protected $description = 'List all discovered handlers';
+	protected $group       = 'Housekeeping';
+	protected $name        = 'handlers:list';
+	protected $description = 'List all discovered handlers';
 	protected $usage       = 'handlers:list';
 
 	public function run(array $params = [])
-    {
-    	// Load the library
+	{
+		// Load the library
 		$handlers = new Handlers();
 
 		// Make sure auto-discovery is enabled
@@ -34,7 +34,7 @@ class HandlersList extends BaseCommand
 				CLI::write('No handlers detected.', 'yellow');
 				continue;
 			}
-			
+
 			// Display each class
 			foreach ($classes as $class)
 			{
