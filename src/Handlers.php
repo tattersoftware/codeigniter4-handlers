@@ -94,6 +94,20 @@ class Handlers
 		return $this;
 	}
 
+	/**
+	 * Returns the attributes for a discovered class.
+	 *
+	 * @param string $class
+	 *
+	 * @return array|null
+	 */
+	public function getAttributes(string $class): ?array
+	{
+		$this->discoverHandlers();
+
+		return $this->discovered[$class] ?? null;
+	}
+
 	//--------------------------------------------------------------------
 
 	/**
