@@ -3,6 +3,7 @@
 use Tatter\Handlers\Handlers;
 use Tatter\Handlers\Config\Handlers as HandlersConfig;
 use Tests\Support\HandlerTestCase;
+use Tests\Support\Factories\WidgetFactory;
 
 class LibraryTest extends HandlerTestCase
 {
@@ -89,5 +90,20 @@ class LibraryTest extends HandlerTestCase
 		$this->handlers->register();
 
 		$this->assertEquals(true, session('didRegister'));
+	}
+
+	public function testGetAttributesReturnsAttributes()
+	{
+		$result = $this->handlers->getAttributes(WidgetFactory::class);
+
+		$this->assertIsArray($result);
+		$this->assertEquals('Widget Plant', $result['name']);
+	}
+
+	public function testGetAttributesReturnsNull()
+	{
+		$result = $this->handlers->getAttributes('Imaginary\Handler\Class');
+
+		$this->assertNull($result);
 	}
 }

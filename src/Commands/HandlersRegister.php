@@ -6,14 +6,14 @@ use Tatter\Handlers\Handlers;
 
 class HandlersRegister extends BaseCommand
 {
-    protected $group       = 'Housekeeping';
-    protected $name        = 'handlers:register';
-    protected $description = 'Regsiter all discovered handlers';
+	protected $group       = 'Housekeeping';
+	protected $name        = 'handlers:register';
+	protected $description = 'Regsiter all discovered handlers';
 	protected $usage       = 'handlers:register';
 
 	public function run(array $params = [])
-    {
-    	// Load the library
+	{
+		// Load the library
 		$handlers = new Handlers();
 
 		// Make sure auto-discovery is enabled

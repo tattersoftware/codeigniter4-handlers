@@ -45,7 +45,7 @@ class Handlers
 	/**
 	 * Initializes the library.
 	 *
-	 * @param string $path
+	 * @param string              $path
 	 * @param HandlersConfig|null $config
 	 * @param CacheInterface|null $cache
 	 */
@@ -92,6 +92,20 @@ class Handlers
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Returns the attributes for a discovered class.
+	 *
+	 * @param string $class
+	 *
+	 * @return array|null
+	 */
+	public function getAttributes(string $class): ?array
+	{
+		$this->discoverHandlers();
+
+		return $this->discovered[$class] ?? null;
 	}
 
 	//--------------------------------------------------------------------
@@ -167,7 +181,7 @@ class Handlers
 	 * Returns a handler with a given name. Ignores filters.
 	 * Searches: attribute "name" or "uid", namespaced class, and short class name.
 	 *
-	 * @param string $name  The name of the handler
+	 * @param string $name The name of the handler
 	 *
 	 * @return string|null  The full class name, or null if none found
 	 */
@@ -213,7 +227,7 @@ class Handlers
 	/**
 	 * Returns an array of all matched classes.
 	 *
-	 * @return array<string>
+	 * @return     array<string>
 	 * @deprecated Use findAll()
 	 */
 	public function all(): array
@@ -225,9 +239,9 @@ class Handlers
 	 * Returns a handler with a given name. Ignores filters.
 	 * Searches: attribute "name" or "uid", namespaced class, and short class name.
 	 *
-	 * @param string $name  The name of the handler
+	 * @param string $name The name of the handler
 	 *
-	 * @return string|null  The full class name, or null if none found
+	 * @return     string|null  The full class name, or null if none found
 	 * @deprecated Use find()
 	 */
 	public function named(string $name): ?string
@@ -240,8 +254,8 @@ class Handlers
 	/**
 	 * Parses "where" $criteria and adds to $filters
 	 *
-	 * @param array $criteria  Array of 'key [operator]' => 'value'
-	 * @param bool $combine    Whether the resulting filter should be combined with others
+	 * @param array   $criteria Array of 'key [operator]' => 'value'
+	 * @param boolean $combine  Whether the resulting filter should be combined with others
 	 */
 	protected function parseCriteria(array $criteria, bool $combine): void
 	{
@@ -258,7 +272,12 @@ class Handlers
 				$operator = '==';
 			}
 
-			$this->filters[] = [$key, $operator, $value, $combine];
+			$this->filters[] = [
+				$key,
+				$operator,
+				$value,
+				$combine,
+			];
 		}
 	}
 
@@ -299,7 +318,7 @@ class Handlers
 	/**
 	 * Filters discovered classes by the defined criteria.
 	 *
-	 * @param int|null $limit  Limit on how many classes to match
+	 * @param integer|null $limit Limit on how many classes to match
 	 *
 	 * @return array<string>
 	 * @throws \RuntimeException
@@ -345,11 +364,11 @@ class Handlers
 					break;
 
 					case '>':
-						$test = $attributes[$key] > $value;						
+						$test = $attributes[$key] > $value;
 					break;
 
 					case '>=':
-						$test = $attributes[$key] >= $value;						
+						$test = $attributes[$key] >= $value;
 					break;
 
 					case '<':
@@ -407,7 +426,8 @@ class Handlers
 		}
 
 		// Check the cache first
-		$this->cacheRestore();		
+		$this->cacheRestore();
+
 		if ($this->discovered !== null)
 		{
 			return $this;
@@ -436,7 +456,7 @@ class Handlers
 				{
 					continue;
 				}
-				
+
 				// A match! Get the instance attributes
 				$attributes = (new $class())->toArray();
 
@@ -456,8 +476,8 @@ class Handlers
 	 * Validates that a file path contains a HandlerInterface and
 	 * returns its full class name.
 	 *
-	 * @param string $file  Full path to the file in question
-	 * @param string $namespace  The file's namespace
+	 * @param string $file      Full path to the file in question
+	 * @param string $namespace The file's namespace
 	 *
 	 * @return string|null  The fully-namespaced class
 	 */

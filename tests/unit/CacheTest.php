@@ -10,8 +10,8 @@ class CacheTest extends HandlerTestCase
 		$class = 'Foo\Bar\Baz';
 
 		cache()->save('handlers-factories', [
-			$class => ['name' => 'foobar']
-		]);
+				   $class => ['name' => 'foobar'],
+			   ]);
 
 		$result = $this->handlers->first();
 
@@ -23,10 +23,10 @@ class CacheTest extends HandlerTestCase
 		$expected = 'Tests\Support\Factories\PopFactory';
 
 		$this->config->cacheDuration = null;
-		$handlers = new Handlers('Factories', $this->config);
+		$handlers                    = new Handlers('Factories', $this->config);
 
 		cache()->save('handlers-factories', [
-			'Foo\Bar\Baz' => ['name' => 'foobar']
+			'Foo\Bar\Baz' => ['name' => 'foobar'],
 		]);
 
 		$result = $this->handlers->first();

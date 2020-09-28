@@ -6,14 +6,14 @@ use Tatter\Handlers\Handlers;
 
 class HandlersReset extends BaseCommand
 {
-    protected $group       = 'Housekeeping';
-    protected $name        = 'handlers:reset';
-    protected $description = 'Clear cached versions of discovered handlers';
+	protected $group       = 'Housekeeping';
+	protected $name        = 'handlers:reset';
+	protected $description = 'Clear cached versions of discovered handlers';
 	protected $usage       = 'handlers:reset';
 
 	public function run(array $params = [])
-    {
-    	// Load the library
+	{
+		// Load the library
 		$handlers = new Handlers();
 
 		// Make sure auto-discovery is enabled
