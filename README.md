@@ -5,7 +5,7 @@ Cross-module handler registration, for CodeIgniter 4
 
 1. Install with Composer: `> composer require tatter/handlers`
 2. Load the library with the handler path: `$handlers = new \Tatter\Handlers\Handlers('Thumbnails');`
-2. Discover classes from any namespace: `$classes = $handlers->all();`
+2. Discover classes from any namespace: `$classes = $handlers->findAll();`
 
 ## Features
 
@@ -98,7 +98,7 @@ on their attributes:
 
 ```
 // Iterate through all discovered handlers
-foreach ($handlers->all() as $class)
+foreach ($handlers->findAll() as $class)
 {
 	$widget = new $class($param1, $param2);
 	$widget->display();
