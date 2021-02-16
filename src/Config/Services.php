@@ -1,11 +1,11 @@
 <?php namespace Tatter\Handlers\Config;
 
 use CodeIgniter\Cache\CacheInterface;
-use CodeIgniter\Config\BaseService;
+use Config\Services as BaseServices;
 use Tatter\Handlers\Handlers;
 use Tatter\Handlers\Config\Handlers as HandlersConfig;
 
-class Services extends BaseService
+class Services extends BaseServices
 {
 	/**
 	 * @param string              $path
@@ -17,7 +17,15 @@ class Services extends BaseService
 	{
 		if ($getShared)
 		{
-			return static::getSharedInstance('handlers', $path, $config, $cache);
+			$service = static::getSharedInstance('handlers', $path, $config, $cache);
+
+			// Need to make sure the path is correct
+			if ($path && $path !== $service->getPath())
+			{
+				$service = (clone $service)->setPath($path);
+			}
+
+			return $service;
 		}
 
 		return new Handlers($path, $config, $cache);
