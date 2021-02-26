@@ -2,7 +2,7 @@
 
 use Tatter\Handlers\Interfaces\HandlerInterface;
 
-class BaseHandler implements HandlerInterface
+abstract class BaseHandler implements HandlerInterface
 {
 	use \Tatter\Handlers\Traits\HandlerTrait;
 
@@ -11,5 +11,16 @@ class BaseHandler implements HandlerInterface
 	 *
 	 * @var array
 	 */
-	protected $attributes;
+	protected $attributes = [];
+
+	/**
+	 * Checks for and merges default attributes.
+	 */
+	public function __construct()
+	{
+		if (property_exists($this, 'defaults') && is_array($this->defaults))
+		{
+			$this->attributes = array_merge($this->defaults, $this->attributes);
+		}
+	}
 }
