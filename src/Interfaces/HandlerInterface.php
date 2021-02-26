@@ -8,7 +8,6 @@
  * Note:
  * This interface will always be compatible with CodeIgniter\Entity.
  */
-
 interface HandlerInterface
 {
 	/**
