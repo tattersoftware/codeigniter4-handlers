@@ -1,6 +1,11 @@
 # Tatter\Handlers
 Cross-module handler registration, for CodeIgniter 4
 
+[![](https://github.com/tattersoftware/codeigniter4-handlers/workflows/PHPUnit/badge.svg)](https://github.com/tattersoftware/codeigniter4-handlers/actions/workflows/test.yml)
+[![](https://github.com/tattersoftware/codeigniter4-handlers/workflows/PHPStan/badge.svg)](https://github.com/tattersoftware/codeigniter4-handlers/actions/workflows/analyze.yml)
+[![](https://github.com/tattersoftware/codeigniter4-handlers/workflows/Deptrac/badge.svg)](https://github.com/tattersoftware/codeigniter4-handlers/actions/workflows/inspect.yml)
+[![Coverage Status](https://coveralls.io/repos/github/tattersoftware/codeigniter4-handlers/badge.svg?branch=develop)](https://coveralls.io/github/tattersoftware/codeigniter4-handlers?branch=develop)
+
 ## Quick Start
 
 1. Install with Composer: `> composer require tatter/handlers`
