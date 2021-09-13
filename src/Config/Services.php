@@ -1,19 +1,15 @@
-<?php namespace Tatter\Handlers\Config;
+<?php
+
+namespace Tatter\Handlers\Config;
 
 use CodeIgniter\Cache\CacheInterface;
 use Config\Services as BaseServices;
-use Tatter\Handlers\Handlers;
 use Tatter\Handlers\Config\Handlers as HandlersConfig;
+use Tatter\Handlers\Handlers;
 
 class Services extends BaseServices
 {
-	/**
-	 * @param string              $path
-	 * @param HandlersConfig|null $config
-	 * @param CacheInterface|null $cache
-	 * @param boolean             $getShared
-	 */
-	public static function handlers(string $path = '', HandlersConfig $config = null, CacheInterface $cache = null, bool $getShared = true)
+	public static function handlers(string $path = '', ?HandlersConfig $config = null, ?CacheInterface $cache = null, bool $getShared = true)
 	{
 		if ($getShared)
 		{

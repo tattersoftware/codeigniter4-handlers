@@ -1,4 +1,6 @@
-<?php namespace Tatter\Handlers\Commands;
+<?php
+
+namespace Tatter\Handlers\Commands;
 
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
@@ -20,6 +22,7 @@ class HandlersRegister extends BaseCommand
 		if (empty($handlers->getConfig()->autoDiscover))
 		{
 			CLI::write('No paths are set for automatic discovery. See the config file for Tatter\Handlers.', 'yellow');
+
 			return;
 		}
 
@@ -32,6 +35,7 @@ class HandlersRegister extends BaseCommand
 			if (! $classes = $handlers->all())
 			{
 				CLI::write('No new handlers registered.', 'yellow');
+
 				continue;
 			}
 

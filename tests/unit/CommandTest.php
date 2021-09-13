@@ -6,8 +6,10 @@ use Tests\Support\HandlerTestCase;
 
 /**
  * @see https://github.com/codeigniter4/CodeIgniter4/blob/develop/tests/system/Commands/HelpCommandTest.php
+ *
+ * @internal
  */
-class CommandTest extends HandlerTestCase
+final class CommandTest extends HandlerTestCase
 {
 	private $streamFilter;
 

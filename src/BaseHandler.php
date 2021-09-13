@@ -1,4 +1,6 @@
-<?php namespace Tatter\Handlers;
+<?php
+
+namespace Tatter\Handlers;
 
 use Tatter\Handlers\Interfaces\HandlerInterface;
 

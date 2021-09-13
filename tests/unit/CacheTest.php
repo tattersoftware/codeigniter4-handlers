@@ -3,7 +3,10 @@
 use Tatter\Handlers\Handlers;
 use Tests\Support\HandlerTestCase;
 
-class CacheTest extends HandlerTestCase
+/**
+ * @internal
+ */
+final class CacheTest extends HandlerTestCase
 {
 	public function testDiscoveryUsesCache()
 	{
@@ -15,7 +18,7 @@ class CacheTest extends HandlerTestCase
 
 		$result = $this->handlers->first();
 
-		$this->assertEquals($class, $result);
+		$this->assertSame($class, $result);
 	}
 
 	public function testDiscoveryIgnoresCache()
@@ -31,6 +34,6 @@ class CacheTest extends HandlerTestCase
 
 		$result = $this->handlers->first();
 
-		$this->assertEquals($expected, $result);
+		$this->assertSame($expected, $result);
 	}
 }

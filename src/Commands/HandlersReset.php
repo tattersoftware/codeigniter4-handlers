@@ -1,4 +1,6 @@
-<?php namespace Tatter\Handlers\Commands;
+<?php
+
+namespace Tatter\Handlers\Commands;
 
 use CodeIgniter\CLI\BaseCommand;
 use CodeIgniter\CLI\CLI;
@@ -20,6 +22,7 @@ class HandlersReset extends BaseCommand
 		if (empty($handlers->getConfig()->autoDiscover))
 		{
 			CLI::write('No paths are set for automatic discovery. See the config file for Tatter\Handlers.', 'yellow');
+
 			return;
 		}
 

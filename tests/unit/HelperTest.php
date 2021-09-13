@@ -3,7 +3,10 @@
 use Tatter\Handlers\Handlers;
 use Tests\Support\HandlerTestCase;
 
-class HelperTest extends HandlerTestCase
+/**
+ * @internal
+ */
+final class HelperTest extends HandlerTestCase
 {
 	protected function setUp(): void
 	{
@@ -26,6 +29,6 @@ class HelperTest extends HandlerTestCase
 
 		$result = handlers()->getPath();
 
-		$this->assertEquals($path, $result);
+		$this->assertSame($path, $result);
 	}
 }

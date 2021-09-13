@@ -1,25 +1,27 @@
 <?php
 
-use Tatter\Handlers\Handlers;
 use Tatter\Handlers\Config\Handlers as HandlersConfig;
-use Tests\Support\HandlerTestCase;
 use Tests\Support\Factories\WidgetFactory;
+use Tests\Support\HandlerTestCase;
 
-class LibraryTest extends HandlerTestCase
+/**
+ * @internal
+ */
+final class LibraryTest extends HandlerTestCase
 {
 	public function testGetConfigReturnsConfig()
 	{
 		$result = $this->handlers->getConfig();
 
 		$this->assertInstanceOf(HandlersConfig::class, $result);
-		$this->assertEquals(MINUTE, $result->cacheDuration);
+		$this->assertSame(MINUTE, $result->cacheDuration);
 	}
 
 	public function testGetPathReturnsPath()
 	{
 		$result = $this->handlers->getPath();
 
-		$this->assertEquals('Factories', $result);
+		$this->assertSame('Factories', $result);
 	}
 
 	public function testSetPathChangesPath()
@@ -27,7 +29,7 @@ class LibraryTest extends HandlerTestCase
 		$path   = 'Daiquiris';
 		$result = $this->handlers->setPath($path)->getPath();
 
-		$this->assertEquals($path, $result);
+		$this->assertSame($path, $result);
 	}
 
 	public function testWhereCombinesFilters()
@@ -35,14 +37,14 @@ class LibraryTest extends HandlerTestCase
 		$this->handlers->where(['group' => 'East']);
 
 		$result = $this->getPrivateProperty($this->handlers, 'filters');
-		$this->assertEquals($result, [
+		$this->assertSame($result, [
 			['group', '==', 'East', true],
 		]);
 
 		$this->handlers->where(['uid' => 'pop']);
 
 		$result = $this->getPrivateProperty($this->handlers, 'filters');
-		$this->assertEquals($result, [
+		$this->assertSame($result, [
 			['group', '==', 'East', true],
 			['uid', '==', 'pop', true],
 		]);
@@ -54,7 +56,7 @@ class LibraryTest extends HandlerTestCase
 		$this->handlers->reset();
 
 		$result = $this->getPrivateProperty($this->handlers, 'filters');
-		$this->assertEquals($result, []);
+		$this->assertSame($result, []);
 	}
 
 	public function testGetHandlerClassReturnsClass()
@@ -64,7 +66,7 @@ class LibraryTest extends HandlerTestCase
 		$file   = realpath(SUPPORTPATH . 'Factories/WidgetFactory.php');
 		$result = $this->handlers->getHandlerClass($file, 'Tests\Support');
 
-		$this->assertEquals($expected, $result);
+		$this->assertSame($expected, $result);
 	}
 
 	public function testGetHandlerClassFails()
@@ -89,7 +91,7 @@ class LibraryTest extends HandlerTestCase
 	{
 		$this->handlers->register();
 
-		$this->assertEquals(true, session('didRegister'));
+		$this->assertTrue(session('didRegister'));
 	}
 
 	public function testGetAttributesReturnsAttributes()
@@ -97,7 +99,7 @@ class LibraryTest extends HandlerTestCase
 		$result = $this->handlers->getAttributes(WidgetFactory::class);
 
 		$this->assertIsArray($result);
-		$this->assertEquals('Widget Plant', $result['name']);
+		$this->assertSame('Widget Plant', $result['name']);
 	}
 
 	public function testGetAttributesReturnsNull()
