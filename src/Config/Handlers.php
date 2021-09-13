@@ -1,4 +1,6 @@
-<?php namespace Tatter\Handlers\Config;
+<?php
+
+namespace Tatter\Handlers\Config;
 
 use CodeIgniter\Config\BaseConfig;
 
@@ -22,7 +24,7 @@ class Handlers extends BaseConfig
 	 * Number of seconds to cache discovered handlers.
 	 * Null disables caching
 	 *
-	 * @var integer|null
+	 * @var int|null
 	 */
 	public $cacheDuration = DAY;
 }

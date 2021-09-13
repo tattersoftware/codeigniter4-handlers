@@ -1,4 +1,6 @@
-<?php namespace Tatter\Handlers;
+<?php
+
+namespace Tatter\Handlers;
 
 use CodeIgniter\Cache\CacheInterface;
 use Config\Services;
@@ -44,12 +46,8 @@ class Handlers
 
 	/**
 	 * Initializes the library.
-	 *
-	 * @param string              $path
-	 * @param HandlersConfig|null $config
-	 * @param CacheInterface|null $cache
 	 */
-	public function __construct(string $path = '', HandlersConfig $config = null, CacheInterface $cache = null)
+	public function __construct(string $path = '', ?HandlersConfig $config = null, ?CacheInterface $cache = null)
 	{
 		$this->path   = $path;
 		$this->config = $config ?? config('Handlers');
@@ -58,8 +56,6 @@ class Handlers
 
 	/**
 	 * Returns the current configuration.
-	 *
-	 * @return HandlersConfig
 	 */
 	public function getConfig(): HandlersConfig
 	{
@@ -68,8 +64,6 @@ class Handlers
 
 	/**
 	 * Returns the search path.
-	 *
-	 * @return string
 	 */
 	public function getPath(): string
 	{
@@ -78,8 +72,6 @@ class Handlers
 
 	/**
 	 * Sets the search path and resets discovery.
-	 *
-	 * @param string $path
 	 *
 	 * @return $this
 	 */
@@ -96,10 +88,6 @@ class Handlers
 
 	/**
 	 * Returns the attributes for a discovered class.
-	 *
-	 * @param string $class
-	 *
-	 * @return array|null
 	 */
 	public function getAttributes(string $class): ?array
 	{
@@ -156,12 +144,13 @@ class Handlers
 	 * Returns the first matched class. Short-circuits the namespace
 	 * traversal to optimize performance.
 	 *
-	 * @return string|null  The full class name, or null if none found
+	 * @return string|null The full class name, or null if none found
 	 */
 	public function first(): ?string
 	{
 		$class = $this->filterHandlers()[0] ?? null;
 		$this->reset();
+
 		return $class;
 	}
 
@@ -174,6 +163,7 @@ class Handlers
 	{
 		$classes = $this->filterHandlers();
 		$this->reset();
+
 		return $classes;
 	}
 
@@ -183,7 +173,7 @@ class Handlers
 	 *
 	 * @param string $name The name of the handler
 	 *
-	 * @return string|null  The full class name, or null if none found
+	 * @return string|null The full class name, or null if none found
 	 */
 	public function find(string $name): ?string
 	{
@@ -227,7 +217,8 @@ class Handlers
 	/**
 	 * Returns an array of all matched classes.
 	 *
-	 * @return     array<string>
+	 * @return array<string>
+	 *
 	 * @deprecated Use findAll()
 	 */
 	public function all(): array
@@ -241,7 +232,8 @@ class Handlers
 	 *
 	 * @param string $name The name of the handler
 	 *
-	 * @return     string|null  The full class name, or null if none found
+	 * @return string|null The full class name, or null if none found
+	 *
 	 * @deprecated Use find()
 	 */
 	public function named(string $name): ?string
@@ -254,8 +246,8 @@ class Handlers
 	/**
 	 * Parses "where" $criteria and adds to $filters
 	 *
-	 * @param array   $criteria Array of 'key [operator]' => 'value'
-	 * @param boolean $combine  Whether the resulting filter should be combined with others
+	 * @param array $criteria Array of 'key [operator]' => 'value'
+	 * @param bool  $combine  Whether the resulting filter should be combined with others
 	 */
 	protected function parseCriteria(array $criteria, bool $combine): void
 	{
@@ -265,10 +257,9 @@ class Handlers
 			$key = trim($key);
 			if (strpos($key, ' '))
 			{
-				list($key, $operator) = explode(' ', $key);
+				[$key, $operator] = explode(' ', $key);
 			}
-			else
-			{
+			else {
 				$operator = '==';
 			}
 
@@ -284,7 +275,7 @@ class Handlers
 	/**
 	 * Iterates through discovered handlers and attempts to register them.
 	 *
-	 * @return array<string>  Array of newly-registered classes
+	 * @return array<string> Array of newly-registered classes
 	 */
 	public function register(): array
 	{
@@ -298,6 +289,7 @@ class Handlers
 		service('timer')->start('Register ' . $this->path);
 
 		$classes = [];
+
 		foreach ($this->discovered as $class => $attributes)
 		{
 			$instance = new $class();
@@ -318,12 +310,13 @@ class Handlers
 	/**
 	 * Filters discovered classes by the defined criteria.
 	 *
-	 * @param integer|null $limit Limit on how many classes to match
+	 * @param int|null $limit Limit on how many classes to match
+	 *
+	 * @throws \RuntimeException
 	 *
 	 * @return array<string>
-	 * @throws \RuntimeException
 	 */
-	protected function filterHandlers(int $limit = null): array
+	protected function filterHandlers(?int $limit = null): array
 	{
 		$this->discoverHandlers();
 
@@ -336,6 +329,7 @@ class Handlers
 		}
 
 		$classes = [];
+
 		foreach ($this->discovered as $class => $attributes)
 		{
 			$result = true;
@@ -344,11 +338,12 @@ class Handlers
 			foreach ($this->filters as $filter)
 			{
 				// Split out the array to make it easier to read
-				list($key, $operator, $value, $combine) = $filter;
+				[$key, $operator, $value, $combine] = $filter;
 
 				if (! isset($attributes[$key]))
 				{
 					$result = false;
+
 					continue;
 				}
 
@@ -356,7 +351,7 @@ class Handlers
 				{
 					case '==':
 					case '=':
-						$test = $attributes[$key] == $value;
+						$test = $attributes[$key] === $value;
 					break;
 
 					case '===':
@@ -381,7 +376,7 @@ class Handlers
 
 					// Assumes the attribute is a CSV
 					case 'has':
-						$test = in_array($value, explode(',', $attributes[$key]));
+						$test = in_array($value, explode(',', $attributes[$key]), true);
 					break;
 
 					default:
@@ -440,6 +435,7 @@ class Handlers
 
 		// Scan each namespace
 		$this->discovered = [];
+
 		foreach (Services::autoloader()->getNamespace() as $namespace => $paths)
 		{
 			// Check for files in $this->path for this namespace
@@ -452,7 +448,7 @@ class Handlers
 				}
 
 				// Make sure it is not an ignored class
-				if (in_array($class, $this->config->ignoredClasses))
+				if (in_array($class, $this->config->ignoredClasses, true))
 				{
 					continue;
 				}
@@ -479,7 +475,7 @@ class Handlers
 	 * @param string $file      Full path to the file in question
 	 * @param string $namespace The file's namespace
 	 *
-	 * @return string|null  The fully-namespaced class
+	 * @return string|null The fully-namespaced class
 	 */
 	public function getHandlerClass(string $file, string $namespace): ?string
 	{
@@ -490,8 +486,7 @@ class Handlers
 		}
 
 		// Try to load the file
-		try
-		{
+		try {
 			include_once $file;
 		}
 		catch (\Throwable $e)
@@ -514,7 +509,7 @@ class Handlers
 			return null;
 		}
 
-		if (! in_array(HandlerInterface::class, $interfaces))
+		if (! in_array(HandlerInterface::class, $interfaces, true))
 		{
 			return null;
 		}
@@ -526,8 +521,6 @@ class Handlers
 
 	/**
 	 * Returns a standardized caching key for the current path.
-	 *
-	 * @return string
 	 */
 	protected function cacheKey(): string
 	{

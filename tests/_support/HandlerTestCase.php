@@ -1,10 +1,15 @@
-<?php namespace Tests\Support;
+<?php
+
+namespace Tests\Support;
 
 use CodeIgniter\Test\CIUnitTestCase;
 use Tatter\Handlers\Config\Handlers as HandlersConfig;
 use Tatter\Handlers\Handlers;
 
-class HandlerTestCase extends CIUnitTestCase
+/**
+ * @internal
+ */
+abstract class HandlerTestCase extends CIUnitTestCase
 {
 	/**
 	 * The configuration.

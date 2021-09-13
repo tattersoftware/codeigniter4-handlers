@@ -1,4 +1,6 @@
-<?php namespace Tests\Support\Factories;
+<?php
+
+namespace Tests\Support\Factories;
 
 use Tatter\Handlers\Interfaces\HandlerInterface;
 
