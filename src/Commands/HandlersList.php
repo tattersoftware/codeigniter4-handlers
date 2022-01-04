@@ -32,7 +32,7 @@ class HandlersList extends BaseCommand
 			$handlers->setPath($path);
 			CLI::write($path, 'black', 'light_gray');
 
-			if (! $classes = $handlers->all())
+			if (! $classes = $handlers->findAll())
 			{
 				CLI::write('No handlers detected.', 'yellow');
 

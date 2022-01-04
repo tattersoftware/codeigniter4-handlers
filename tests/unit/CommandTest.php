@@ -1,6 +1,6 @@
 <?php
 
-use CodeIgniter\Config\Config;
+use CodeIgniter\Config\Factories;
 use CodeIgniter\Test\Filters\CITestStreamFilter;
 use Tests\Support\HandlerTestCase;
 
@@ -24,6 +24,8 @@ final class CommandTest extends HandlerTestCase
 
 	protected function tearDown(): void
 	{
+		parent::tearDown();
+
 		stream_filter_remove($this->streamFilter);
 	}
 
@@ -44,7 +46,7 @@ final class CommandTest extends HandlerTestCase
 	public function testListCommandOutputsClasses()
 	{
 		$this->config->autoDiscover = ['Factories'];
-		Config::injectMock('Handlers', $this->config);
+		Factories::injectMock('Config', 'Handlers', $this->config);
 
 		command('handlers:list');
 
