@@ -8,27 +8,27 @@ use Tests\Support\HandlerTestCase;
  */
 final class HelperTest extends HandlerTestCase
 {
-	protected function setUp(): void
-	{
-		parent::setUp();
+    protected function setUp(): void
+    {
+        parent::setUp();
 
-		helper('handlers');
-	}
+        helper('handlers');
+    }
 
-	public function testHelperReturnsLibrary()
-	{
-		$result = handlers();
+    public function testHelperReturnsLibrary()
+    {
+        $result = handlers();
 
-		$this->assertInstanceOf(Handlers::class, $result);
-	}
+        $this->assertInstanceOf(Handlers::class, $result);
+    }
 
-	public function testHelperRetainsPath()
-	{
-		$path = 'Marmalade';
-		handlers($path);
+    public function testHelperRetainsPath()
+    {
+        $path = 'Marmalade';
+        handlers($path);
 
-		$result = handlers()->getPath();
+        $result = handlers()->getPath();
 
-		$this->assertSame($path, $result);
-	}
+        $this->assertSame($path, $result);
+    }
 }

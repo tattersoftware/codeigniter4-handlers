@@ -11,45 +11,45 @@ use Tests\Support\HandlerTestCase;
  */
 final class CommandTest extends HandlerTestCase
 {
-	private $streamFilter;
+    private $streamFilter;
 
-	protected function setUp(): void
-	{
-		parent::setUp();
+    protected function setUp(): void
+    {
+        parent::setUp();
 
-		CITestStreamFilter::$buffer = '';
-		$this->streamFilter         = stream_filter_append(STDOUT, 'CITestStreamFilter');
-		$this->streamFilter         = stream_filter_append(STDERR, 'CITestStreamFilter');
-	}
+        CITestStreamFilter::$buffer = '';
+        $this->streamFilter         = stream_filter_append(STDOUT, 'CITestStreamFilter');
+        $this->streamFilter         = stream_filter_append(STDERR, 'CITestStreamFilter');
+    }
 
-	protected function tearDown(): void
-	{
-		parent::tearDown();
+    protected function tearDown(): void
+    {
+        parent::tearDown();
 
-		stream_filter_remove($this->streamFilter);
-	}
+        stream_filter_remove($this->streamFilter);
+    }
 
-	protected function getBuffer()
-	{
-		return CITestStreamFilter::$buffer;
-	}
+    protected function getBuffer()
+    {
+        return CITestStreamFilter::$buffer;
+    }
 
-	//--------------------------------------------------------------------
+    //--------------------------------------------------------------------
 
-	public function testListCommandFails()
-	{
-		command('handlers:list');
+    public function testListCommandFails()
+    {
+        command('handlers:list');
 
-		$this->assertStringContainsString('No paths are set for automatic discovery', $this->getBuffer());
-	}
+        $this->assertStringContainsString('No paths are set for automatic discovery', $this->getBuffer());
+    }
 
-	public function testListCommandOutputsClasses()
-	{
-		$this->config->autoDiscover = ['Factories'];
-		Factories::injectMock('Config', 'Handlers', $this->config);
+    public function testListCommandOutputsClasses()
+    {
+        $this->config->autoDiscover = ['Factories'];
+        Factories::injectMock('Config', 'Handlers', $this->config);
 
-		command('handlers:list');
+        command('handlers:list');
 
-		$this->assertStringContainsString('Tests\Support\Factories\WidgetFactory', $this->getBuffer());
-	}
+        $this->assertStringContainsString('Tests\Support\Factories\WidgetFactory', $this->getBuffer());
+    }
 }
