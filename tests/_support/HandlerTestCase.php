@@ -11,34 +11,34 @@ use Tatter\Handlers\Handlers;
  */
 abstract class HandlerTestCase extends CIUnitTestCase
 {
-	/**
-	 * The configuration.
-	 *
-	 * @var HandlersConfig
-	 */
-	protected $config;
+    /**
+     * The configuration.
+     *
+     * @var HandlersConfig
+     */
+    protected $config;
 
-	/**
-	 * Instance of our Handlers library.
-	 *
-	 * @var Handlers
-	 */
-	protected $handlers;
+    /**
+     * Instance of our Handlers library.
+     *
+     * @var Handlers
+     */
+    protected $handlers;
 
-	protected function setUp(): void
-	{
-		parent::setUp();
+    protected function setUp(): void
+    {
+        parent::setUp();
 
-		$this->config                = new HandlersConfig();
-		$this->config->cacheDuration = MINUTE;
+        $this->config                = new HandlersConfig();
+        $this->config->cacheDuration = MINUTE;
 
-		$this->handlers = new Handlers('Factories', $this->config);
-	}
+        $this->handlers = new Handlers('Factories', $this->config);
+    }
 
-	protected function tearDown(): void
-	{
-		parent::tearDown();
+    protected function tearDown(): void
+    {
+        parent::tearDown();
 
-		$this->handlers->cacheClear();
-	}
+        $this->handlers->cacheClear();
+    }
 }

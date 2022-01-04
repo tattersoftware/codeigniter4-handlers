@@ -8,12 +8,12 @@ use Tests\Support\HandlerTestCase;
  */
 final class ServiceTest extends HandlerTestCase
 {
-	public function testReturnsExpectedPath()
-	{
-		$foos = Services::handlers('foo');
-		$bars = Services::handlers('bar');
+    public function testReturnsExpectedPath()
+    {
+        $foos = Services::handlers('foo');
+        $bars = Services::handlers('bar');
 
-		$this->assertSame('foo', $foos->getPath());
-		$this->assertSame('bar', $bars->getPath());
-	}
+        $this->assertSame('foo', $foos->getPath());
+        $this->assertSame('bar', $bars->getPath());
+    }
 }
