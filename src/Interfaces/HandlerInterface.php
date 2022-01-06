@@ -3,35 +3,21 @@
 namespace Tatter\Handlers\Interfaces;
 
 /**
- * Interface for anything discoverable by Handlers. Ensures that
- * attributes can be properly read. In addition to these methods
- * the class must also support initialization without parameters.
- *
- * Note:
- * This interface will always be compatible with CodeIgniter\Entity.
+ * Interface for anything discoverable by the Handlers Library.
+ * Most paths will want their own extended interface.
  */
 interface HandlerInterface
 {
     /**
-     * Magic method to allow retrieval of attributes.
-     *
-     * @return mixed
+     * Returns this handler's identifier,
+     * unique per path.
      */
-    public function __get(string $key);
+    public static function handlerId(): string;
 
     /**
-     * Returns true if a property exists named $key.
-     */
-    public function __isset(string $key): bool;
-
-    /**
-     * Returns a handler's attributes as an array.
-     * Note: parameters are present to maintain compatibility with CodeIgniter\Entity
-     * but are not used by Tatter\Handlers.
+     * Returns the array of path-specific attributes.
      *
-     * @param bool $onlyChanged If true, only return values that have changed since object creation
-     * @param bool $cast        If true, properties will be casted.
-     * @param bool $recursive   If true, inner entities will be casted as array as well.
+     * @return array<string, scalar>
      */
-    public function toArray(bool $onlyChanged = false, bool $cast = true, bool $recursive = false): array;
+    public static function attributes(): array;
 }

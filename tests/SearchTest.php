@@ -1,17 +1,27 @@
 <?php
 
-use Tests\Support\HandlerTestCase;
+use Tests\Support\TestCase;
 
 /**
  * @internal
  */
-final class SearchTest extends HandlerTestCase
+final class SearchTest extends TestCase
 {
+    public function testInvalidOperatorThrows()
+    {
+        $this->expectException('UnexpectedValueException');
+        $this->expectExceptionMessage('# is not a valid criteria operator');
+
+        $this->manager
+            ->where(['cost #' => 42])
+            ->findAll();
+    }
+
     public function testWhereFilters()
     {
         $expected = ['Tests\Support\Factories\WidgetFactory'];
 
-        $result = $this->handlers
+        $result = $this->manager
             ->where(['uid' => 'widget'])
             ->findAll();
 
@@ -22,7 +32,7 @@ final class SearchTest extends HandlerTestCase
     {
         $expected = ['Tests\Support\Factories\WidgetFactory'];
 
-        $result = $this->handlers
+        $result = $this->manager
             ->where(['cost >' => 5])
             ->findAll();
 
@@ -33,7 +43,7 @@ final class SearchTest extends HandlerTestCase
     {
         $expected = ['Tests\Support\Factories\WidgetFactory'];
 
-        $result = $this->handlers
+        $result = $this->manager
             ->where(['list has' => 'three'])
             ->findAll();
 
@@ -42,7 +52,7 @@ final class SearchTest extends HandlerTestCase
 
     public function testWhereMissingAttribute()
     {
-        $result = $this->handlers
+        $result = $this->manager
             ->where(['foo' => 'bar'])
             ->findAll();
 
@@ -53,7 +63,7 @@ final class SearchTest extends HandlerTestCase
     {
         $expected = ['Tests\Support\Factories\WidgetFactory'];
 
-        $result = $this->handlers
+        $result = $this->manager
             ->where(['foo' => 'bar'])
             ->orWhere(['uid' => 'widget'])
             ->findAll();
@@ -70,7 +80,7 @@ final class SearchTest extends HandlerTestCase
             'Tests\Support\Factories\WidgetFactory',
         ];
 
-        $result = $this->handlers->findAll();
+        $result = $this->manager->findAll();
 
         $this->assertSame($expected, $result);
     }
@@ -81,16 +91,16 @@ final class SearchTest extends HandlerTestCase
             'Tests\Support\Factories\WidgetFactory',
         ];
 
-        $result = $this->handlers->where(['uid' => 'widget'])->findAll();
+        $result = $this->manager->where(['uid' => 'widget'])->findAll();
 
         $this->assertSame($expected, $result);
     }
 
     public function testFindAllResetsFilters()
     {
-        $this->handlers->where(['uid' => 'widget'])->findAll();
+        $this->manager->where(['uid' => 'widget'])->findAll();
 
-        $result = $this->getPrivateProperty($this->handlers, 'filters');
+        $result = $this->getPrivateProperty($this->manager, 'filters');
 
         $this->assertSame([], $result);
     }
@@ -99,7 +109,7 @@ final class SearchTest extends HandlerTestCase
     {
         $expected = 'Tests\Support\Factories\PopFactory';
 
-        $result = $this->handlers->first();
+        $result = $this->manager->first();
 
         $this->assertSame($expected, $result);
     }
@@ -108,78 +118,59 @@ final class SearchTest extends HandlerTestCase
     {
         $expected = 'Tests\Support\Factories\WidgetFactory';
 
-        $result = $this->handlers->where(['uid' => 'widget'])->first();
+        $result = $this->manager->where(['uid' => 'widget'])->first();
 
         $this->assertSame($expected, $result);
     }
 
     public function testFirstResetsFilters()
     {
-        $this->handlers->where(['uid' => 'widget'])->first();
+        $this->manager->where(['uid' => 'widget'])->first();
 
-        $result = $this->getPrivateProperty($this->handlers, 'filters');
+        $result = $this->getPrivateProperty($this->manager, 'filters');
 
         $this->assertSame([], $result);
+    }
+
+    public function testFind()
+    {
+        $expected = 'Tests\Support\Factories\PopFactory';
+
+        $result = $this->manager->find('pop');
+
+        $this->assertSame($expected, $result);
     }
 
     //--------------------------------------------------------------------
 
     /**
-     * @dataProvider provideNames
+     * @dataProvider operatorProvider
      *
-     * @param mixed $name
-     * @param mixed $success
+     * @param mixed $operator
+     * @param mixed $input
+     * @param mixed $expected
      */
-    public function testFindFindsMatch($name, $success)
+    public function testOperators($operator, $input, $expected)
     {
-        $result = $this->handlers->find($name);
+        $criterium = 'cost ' . $operator;
 
-        $this->assertSame($success, (bool) $result);
+        $result = $this->manager->where([$criterium => $input])->first();
+
+        $this->assertSame($expected, $result);
     }
 
-    public function provideNames()
+    public function operatorProvider()
     {
         return [
-            [
-                '',
-                false,
-            ],
-            [
-                ' ',
-                false,
-            ],
-            [
-                'pop',
-                true,
-            ],
-            [
-                'PopFactory',
-                true,
-            ],
-            [
-                'Pop Factory',
-                true,
-            ],
-            [
-                'Bad Factory',
-                false,
-            ],
-            [
-                'Not A Factory',
-                false,
-            ],
-            [
-                'Tests\\Support\\Factories',
-                false,
-            ],
-            [
-                'Tests\\Support\Factories\\PopFactory',
-                true,
-            ],
-            [
-                '\\Tests\\Support\\Factories\\PopFactory',
-                true,
-            ],
+            ['==', '1', 'Tests\Support\Factories\PopFactory'],
+            ['==', 1, 'Tests\Support\Factories\PopFactory'],
+            ['=', 1, 'Tests\Support\Factories\PopFactory'],
+            ['=', true, 'Tests\Support\Factories\PopFactory'],
+            ['===', 1, 'Tests\Support\Factories\PopFactory'],
+            ['>', 1, 'Tests\Support\Factories\WidgetFactory'],
+            ['>=', 1, 'Tests\Support\Factories\PopFactory'],
+            ['<', 10, 'Tests\Support\Factories\PopFactory'],
+            ['<=', 10, 'Tests\Support\Factories\PopFactory'],
         ];
     }
 }
