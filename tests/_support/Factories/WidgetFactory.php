@@ -2,19 +2,35 @@
 
 namespace Tests\Support\Factories;
 
-use Tatter\Handlers\BaseHandler;
+use Tatter\Handlers\Interfaces\HandlerInterface;
 
-class WidgetFactory extends BaseHandler
+class WidgetFactory implements HandlerInterface
 {
-    // Attributes for Tatter\Handlers
-    public $attributes = [
-        'group'   => 'East',
-        'name'    => 'Widget Plant',
-        'uid'     => 'widget',
-        'summary' => "The world's largest supplier of widgets!",
-        'cost'    => 10,
-        'list'    => 'one,two,three,four',
-    ];
+    /**
+     * Returns this handler's identifier,
+     * unique per path.
+     */
+    public static function handlerId(): string
+    {
+        return 'widget';
+    }
+
+    /**
+     * Returns the array of path-specific attributes.
+     *
+     * @return array<string, scalar>
+     */
+    public static function attributes(): array
+    {
+        return [
+            'group'   => 'East',
+            'name'    => 'Widget Plant',
+            'uid'     => 'widget',
+            'summary' => "The world's largest supplier of widgets!",
+            'cost'    => 10,
+            'list'    => 'one,two,three,four',
+        ];
+    }
 
     public function process()
     {

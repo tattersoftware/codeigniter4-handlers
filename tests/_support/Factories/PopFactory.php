@@ -6,17 +6,31 @@ use Tatter\Handlers\Interfaces\HandlerInterface;
 
 class PopFactory implements HandlerInterface
 {
-    use \Tatter\Handlers\Traits\HandlerTrait;
+    /**
+     * Returns this handler's identifier,
+     * unique per path.
+     */
+    public static function handlerId(): string
+    {
+        return 'pop';
+    }
 
-    // Attributes for Tatter\Handlers
-    public $attributes = [
-        'group'   => 'East',
-        'name'    => 'Pop Factory',
-        'uid'     => 'pop',
-        'summary' => 'Makes pop',
-        'cost'    => 1,
-        'list'    => 'five,six',
-    ];
+    /**
+     * Returns the array of path-specific attributes.
+     *
+     * @return array<string, scalar>
+     */
+    public static function attributes(): array
+    {
+        return [
+            'group'   => 'East',
+            'name'    => 'Pop Factory',
+            'uid'     => 'pop',
+            'summary' => 'Makes pop',
+            'cost'    => 1,
+            'list'    => 'five,six',
+        ];
+    }
 
     public function process()
     {
