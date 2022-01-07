@@ -71,6 +71,17 @@ final class SearchTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    public function testFilterHandlersStopsAtLimit()
+    {
+        $expected = ['Tests\Support\Factories\PopFactory'];
+
+        $this->manager->where(['cost >=' => 1]);
+		$method = $this->getPrivateMethodInvoker($this->manager, 'filterHandlers');
+		$result = $method(1);
+
+        $this->assertSame($expected, $result);
+    }
+
     //--------------------------------------------------------------------
 
     public function testFindAllDiscoversAll()

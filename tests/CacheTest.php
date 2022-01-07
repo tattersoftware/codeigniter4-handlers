@@ -1,6 +1,6 @@
 <?php
 
-use Tests\Support\FactoryManager;
+use Tests\Support\Managers\FactoryManager;
 use Tests\Support\TestCase;
 
 /**

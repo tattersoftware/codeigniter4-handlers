@@ -3,6 +3,7 @@
 namespace Tests\Support;
 
 use CodeIgniter\Test\CIUnitTestCase;
+use Tests\Support\Managers\FactoryManager;
 
 /**
  * @internal

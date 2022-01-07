@@ -2,13 +2,13 @@
 
 use Tatter\Handlers\BaseManager;
 use Tatter\Handlers\Config\Handlers as HandlersConfig;
-use Tests\Support\FactoryManager;
+use Tests\Support\Managers\FactoryManager;
 use Tests\Support\TestCase;
 
 /**
  * @internal
  */
-final class ManagerTest extends TestCase
+final class BaseManagerTest extends TestCase
 {
     public function testInvalidPathThrows()
     {
@@ -87,6 +87,27 @@ final class ManagerTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    public function testGetHandlerClassRequiresPhpExtension()
+    {
+        $result = $this->manager->getHandlerClass('foo', 'bar');
+
+        $this->assertNull($result);
+    }
+
+    public function testGetHandlerClassRequiresInterfaces()
+    {
+        $result = $this->manager->getHandlerClass(SUPPORTPATH . 'Factories/NotFactory.php', 'Tests\Support');
+
+        $this->assertNull($result);
+    }
+
+    public function testGetHandlerClassRequiresHandlerInterface()
+    {
+        $result = $this->manager->getHandlerClass(SUPPORTPATH . 'Factories/BadFactory.php', 'Tests\Support');
+
+        $this->assertNull($result);
+    }
+
     public function testGetHandlerClassFails()
     {
         $file   = realpath(SUPPORTPATH . 'Factories/WidgetFactory.php');
@@ -131,19 +152,5 @@ final class ManagerTest extends TestCase
         $result = $this->manager->findAll();
 
         $this->assertSame($expected, $result);
-    }
-
-    public function testGetHandlerClassRequiresPhpExtension()
-    {
-        $result = $this->manager->getHandlerClass('foo', 'bar');
-
-        $this->assertNull($result);
-    }
-
-    public function testGetHandlerClassRequiresInterface()
-    {
-        $result = $this->manager->getHandlerClass(SUPPORTPATH . 'Factories/BadFactory.php', 'Tests\Support');
-
-        $this->assertNull($result);
     }
 }

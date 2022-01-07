@@ -334,6 +334,8 @@ abstract class BaseManager
             }
         }
 
+		ksort($this->discovered, SORT_STRING);
+
         // Cache the results
         $this->commitCache();
 
