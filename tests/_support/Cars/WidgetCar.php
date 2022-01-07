@@ -2,9 +2,9 @@
 
 namespace Tests\Support\Cars;
 
-use Tatter\Handlers\Interfaces\HandlerInterface;
+use Tests\Support\Interfaces\ExtendedInterface;
 
-class WidgetCar implements HandlerInterface
+class WidgetCar implements ExtendedInterface
 {
     /**
      * Returns this handler's identifier,

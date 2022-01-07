@@ -3,6 +3,7 @@
 use Tatter\Handlers\BaseFactory;
 use Tatter\Handlers\Config\Handlers as HandlersConfig;
 use Tests\Support\Factories\CarFactory;
+use Tests\Support\Factories\ExtendedFactory;
 use Tests\Support\TestCase;
 
 /**
@@ -85,6 +86,17 @@ final class BaseFactoryTest extends TestCase
         $result = $this->factory->getHandlerClass($file, 'Tests\Support');
 
         $this->assertSame($expected, $result);
+    }
+
+    public function testGetHandlerClassUsesExtendedInterface()
+    {
+        $factory = new ExtendedFactory();
+
+        $result = $factory->getHandlerClass(SUPPORTPATH . 'Cars/WidgetCar.php', 'Tests\Support');
+        $this->assertSame('Tests\Support\Cars\WidgetCar', $result);
+
+        $result = $factory->getHandlerClass(SUPPORTPATH . 'Cars/PopCar.php', 'Tests\Support');
+        $this->assertNull($result);
     }
 
     public function testGetHandlerClassRequiresPhpExtension()
