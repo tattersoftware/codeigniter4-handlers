@@ -1,21 +1,21 @@
 <?php
 
-use Tatter\Handlers\BaseManager;
+use Tatter\Handlers\BaseFactory;
 use Tatter\Handlers\Config\Handlers as HandlersConfig;
-use Tests\Support\Managers\FactoryManager;
+use Tests\Support\Factories\CarFactory;
 use Tests\Support\TestCase;
 
 /**
  * @internal
  */
-final class BaseManagerTest extends TestCase
+final class BaseFactoryTest extends TestCase
 {
     public function testInvalidPathThrows()
     {
         $this->expectException('UnexpectedValueException');
         $this->expectExceptionMessage('Invalid path provided: ');
 
-        new class () extends BaseManager {
+        new class () extends BaseFactory {
             public function getPath(): string
             {
                 return '';
@@ -25,19 +25,19 @@ final class BaseManagerTest extends TestCase
 
     public function testNoDiscoveryReturnsEmptyArray()
     {
-        $manager = new class () extends BaseManager {
+        $factory = new class () extends BaseFactory {
             public function getPath(): string
             {
                 return 'Bananas';
             }
         };
 
-        $this->assertSame([], $manager->findAll());
+        $this->assertSame([], $factory->findAll());
     }
 
     public function testGetConfigReturnsConfig()
     {
-        $result = $this->manager->getConfig();
+        $result = $this->factory->getConfig();
 
         $this->assertInstanceOf(HandlersConfig::class, $result);
         $this->assertNull($result->cacheDuration);
@@ -45,23 +45,23 @@ final class BaseManagerTest extends TestCase
 
     public function testGetPathReturnsPath()
     {
-        $result = $this->manager->getPath();
+        $result = $this->factory->getPath();
 
-        $this->assertSame('Factories', $result);
+        $this->assertSame('Cars', $result);
     }
 
     public function testWhereCombinesFilters()
     {
-        $this->manager->where(['group' => 'East']);
+        $this->factory->where(['group' => 'East']);
 
-        $result = $this->getPrivateProperty($this->manager, 'filters');
+        $result = $this->getPrivateProperty($this->factory, 'filters');
         $this->assertSame($result, [
             ['group', '==', 'East', true],
         ]);
 
-        $this->manager->where(['uid' => 'pop']);
+        $this->factory->where(['uid' => 'pop']);
 
-        $result = $this->getPrivateProperty($this->manager, 'filters');
+        $result = $this->getPrivateProperty($this->factory, 'filters');
         $this->assertSame($result, [
             ['group', '==', 'East', true],
             ['uid', '==', 'pop', true],
@@ -70,48 +70,48 @@ final class BaseManagerTest extends TestCase
 
     public function testResetClearsFilters()
     {
-        $this->manager->where(['group' => 'East']);
-        $this->manager->reset();
+        $this->factory->where(['group' => 'East']);
+        $this->factory->reset();
 
-        $result = $this->getPrivateProperty($this->manager, 'filters');
+        $result = $this->getPrivateProperty($this->factory, 'filters');
         $this->assertSame($result, []);
     }
 
     public function testGetHandlerClassReturnsClass()
     {
-        $expected = 'Tests\Support\Factories\WidgetFactory';
+        $expected = 'Tests\Support\Cars\WidgetCar';
 
-        $file   = realpath(SUPPORTPATH . 'Factories/WidgetFactory.php');
-        $result = $this->manager->getHandlerClass($file, 'Tests\Support');
+        $file   = realpath(SUPPORTPATH . 'Cars/WidgetCar.php');
+        $result = $this->factory->getHandlerClass($file, 'Tests\Support');
 
         $this->assertSame($expected, $result);
     }
 
     public function testGetHandlerClassRequiresPhpExtension()
     {
-        $result = $this->manager->getHandlerClass('foo', 'bar');
+        $result = $this->factory->getHandlerClass('foo', 'bar');
 
         $this->assertNull($result);
     }
 
     public function testGetHandlerClassRequiresInterfaces()
     {
-        $result = $this->manager->getHandlerClass(SUPPORTPATH . 'Factories/NotFactory.php', 'Tests\Support');
+        $result = $this->factory->getHandlerClass(SUPPORTPATH . 'Cars/NotCar.php', 'Tests\Support');
 
         $this->assertNull($result);
     }
 
     public function testGetHandlerClassRequiresHandlerInterface()
     {
-        $result = $this->manager->getHandlerClass(SUPPORTPATH . 'Factories/BadFactory.php', 'Tests\Support');
+        $result = $this->factory->getHandlerClass(SUPPORTPATH . 'Cars/BadCar.php', 'Tests\Support');
 
         $this->assertNull($result);
     }
 
     public function testGetHandlerClassFails()
     {
-        $file   = realpath(SUPPORTPATH . 'Factories/WidgetFactory.php');
-        $result = $this->manager->getHandlerClass($file, 'Foo\Bar');
+        $file   = realpath(SUPPORTPATH . 'Cars/WidgetCar.php');
+        $result = $this->factory->getHandlerClass($file, 'Foo\Bar');
 
         $this->assertNull($result);
     }
@@ -120,7 +120,7 @@ final class BaseManagerTest extends TestCase
     {
         $limit = 1;
 
-        $method = $this->getPrivateMethodInvoker($this->manager, 'filterHandlers');
+        $method = $this->getPrivateMethodInvoker($this->factory, 'filterHandlers');
         $result = $method($limit);
 
         $this->assertCount($limit, $result);
@@ -128,7 +128,7 @@ final class BaseManagerTest extends TestCase
 
     public function testGetAttributesReturnsAttributes()
     {
-        $result = $this->manager->getAttributes('widget');
+        $result = $this->factory->getAttributes('widget');
 
         $this->assertIsArray($result);
         $this->assertSame('Widget Plant', $result['name']);
@@ -136,20 +136,20 @@ final class BaseManagerTest extends TestCase
 
     public function testGetAttributesReturnsNull()
     {
-        $result = $this->manager->getAttributes('Imaginary\Handler\Class');
+        $result = $this->factory->getAttributes('Imaginary\Handler\Class');
 
         $this->assertNull($result);
     }
 
     public function testIgnoresClass()
     {
-        $expected = ['Tests\Support\Factories\WidgetFactory'];
+        $expected = ['Tests\Support\Cars\WidgetCar'];
 
         $config                 = config('Handlers');
-        $config->ignoredClasses = ['Tests\Support\Factories\PopFactory'];
-        $this->manager          = new FactoryManager($config);
+        $config->ignoredClasses = ['Tests\Support\Cars\PopCar'];
+        $this->factory          = new CarFactory($config);
 
-        $result = $this->manager->findAll();
+        $result = $this->factory->findAll();
 
         $this->assertSame($expected, $result);
     }

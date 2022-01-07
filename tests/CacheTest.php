@@ -1,6 +1,6 @@
 <?php
 
-use Tests\Support\Managers\FactoryManager;
+use Tests\Support\Factories\CarFactory;
 use Tests\Support\TestCase;
 
 /**
@@ -12,7 +12,7 @@ final class CacheTest extends TestCase
     {
         parent::tearDown();
 
-        $this->manager->clearCache();
+        $this->factory->clearCache();
     }
 
     public function testDiscoveryUsesCache()
@@ -22,12 +22,12 @@ final class CacheTest extends TestCase
         $config->cacheDuration = MINUTE;
 
         $class = 'Foo\Bar\Baz';
-        cache()->save('handlers-factories', [
+        cache()->save('handlers-cars', [
             'bam' => ['id' => 'bam', 'class' => $class],
         ]);
 
-        $this->manager = new FactoryManager($config);
-        $result        = $this->manager->first();
+        $this->factory = new CarFactory($config);
+        $result        = $this->factory->first();
 
         $this->assertSame($class, $result); // @phpstan-ignore-line
     }
@@ -38,23 +38,23 @@ final class CacheTest extends TestCase
         $config                = config('Handlers');
         $config->cacheDuration = MINUTE;
 
-        $this->manager = new FactoryManager($config);
+        $this->factory = new CarFactory($config);
 
-        $result = cache()->get('handlers-factories');
+        $result = cache()->get('handlers-cars');
 
         $this->assertCount(2, $result);
-        $this->assertSame('Tests\Support\Factories\PopFactory', $result['pop']['class']);
+        $this->assertSame('Tests\Support\Cars\PopCar', $result['pop']['class']);
     }
 
     public function testDiscoveryIgnoresCache()
     {
-        $expected = 'Tests\Support\Factories\PopFactory';
+        $expected = 'Tests\Support\Cars\PopCar';
 
-        cache()->save('handlers-factories', [
+        cache()->save('handlers-cars', [
             'Foo\Bar\Baz' => ['name' => 'foobar'],
         ]);
 
-        $result = $this->manager->first();
+        $result = $this->factory->first();
 
         $this->assertSame($expected, $result);
     }

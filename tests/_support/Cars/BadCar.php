@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Support\Factories;
+namespace Tests\Support\Cars;
 
 use Tests\Support\Interfaces\DummyInterface;
 
-class BadFactory implements DummyInterface
+class BadCar implements DummyInterface
 {
     /**
      * Returns this handler's identifier,
@@ -24,9 +24,9 @@ class BadFactory implements DummyInterface
     {
         return [
             'group'   => 'South',
-            'name'    => 'Bad Factory',
+            'name'    => 'Bad Car',
             'uid'     => 'bad',
-            'summary' => 'This factory does not implement HandlerInterface as it should',
+            'summary' => 'This car does not implement HandlerInterface as it should',
         ];
     }
 

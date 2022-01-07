@@ -1,27 +1,27 @@
 <?php
 
-namespace Tatter\Handlers\Managers;
+namespace Tatter\Handlers\Factories;
 
-use Tatter\Handlers\BaseManager;
+use Tatter\Handlers\BaseFactory;
 use Tatter\Handlers\Interfaces\HandlerInterface;
 
 /**
- * Manager Manager Class
+ * Factory Factory Class
  *
- * Used to discover other Manager classes
+ * Used to discover other Factory classes
  * which are set up as handlers themselves.
  */
-class ManagerManager extends BaseManager implements HandlerInterface
+class FactoryFactory extends BaseFactory implements HandlerInterface
 {
     public static function handlerId(): string
     {
-        return 'managers';
+        return 'factories';
     }
 
     public static function attributes(): array
     {
         return [
-            'name' => 'Manager of Managers',
+            'name' => 'Factory of Factories',
         ];
     }
 
@@ -30,6 +30,6 @@ class ManagerManager extends BaseManager implements HandlerInterface
      */
     public function getPath(): string
     {
-    	return 'Managers';
+        return 'Factories';
     }
 }

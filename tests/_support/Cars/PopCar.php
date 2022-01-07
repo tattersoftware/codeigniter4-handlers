@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Support\Factories;
+namespace Tests\Support\Cars;
 
 use Tatter\Handlers\Interfaces\HandlerInterface;
 
-class PopFactory implements HandlerInterface
+class PopCar implements HandlerInterface
 {
     /**
      * Returns this handler's identifier,
@@ -24,7 +24,7 @@ class PopFactory implements HandlerInterface
     {
         return [
             'group'   => 'East',
-            'name'    => 'Pop Factory',
+            'name'    => 'Pop Car',
             'uid'     => 'pop',
             'summary' => 'Makes pop',
             'cost'    => 1,
