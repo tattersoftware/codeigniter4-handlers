@@ -1,10 +1,10 @@
 <?php
 
-namespace Tests\Support\Factories;
+namespace Tests\Support\Cars;
 
 use Tatter\Handlers\Interfaces\HandlerInterface;
 
-class WidgetFactory implements HandlerInterface
+class WidgetCar implements HandlerInterface
 {
     /**
      * Returns this handler's identifier,

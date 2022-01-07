@@ -8,7 +8,7 @@ use Tatter\Handlers\Interfaces\HandlerInterface;
 use Throwable;
 use UnexpectedValueException;
 
-abstract class BaseManager
+abstract class BaseFactory
 {
     /**
      * The configuration.
@@ -334,7 +334,7 @@ abstract class BaseManager
             }
         }
 
-		ksort($this->discovered, SORT_STRING);
+        ksort($this->discovered, SORT_STRING);
 
         // Cache the results
         $this->commitCache();

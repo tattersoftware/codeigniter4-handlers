@@ -3,7 +3,7 @@
 namespace Tests\Support;
 
 use CodeIgniter\Test\CIUnitTestCase;
-use Tests\Support\Managers\FactoryManager;
+use Tests\Support\Factories\CarFactory;
 
 /**
  * @internal
@@ -13,9 +13,9 @@ abstract class TestCase extends CIUnitTestCase
     /**
      * The configuration.
      *
-     * @var FactoryManager
+     * @var CarFactory
      */
-    protected $manager;
+    protected $factory;
 
     protected function setUp(): void
     {
@@ -24,6 +24,6 @@ abstract class TestCase extends CIUnitTestCase
         // Disable caching for most tests
         $config                = config('Handlers');
         $config->cacheDuration = null;
-        $this->manager         = new FactoryManager($config);
+        $this->factory         = new CarFactory($config);
     }
 }

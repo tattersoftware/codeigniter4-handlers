@@ -1,21 +1,21 @@
 <?php
 
-namespace Tests\Support\Managers;
+namespace Tests\Support\Factories;
 
-use Tatter\Handlers\BaseManager;
+use Tatter\Handlers\BaseFactory;
 use Tatter\Handlers\Interfaces\HandlerInterface;
 
-class FactoryManager extends BaseManager implements HandlerInterface
+class CarFactory extends BaseFactory implements HandlerInterface
 {
     public static function handlerId(): string
     {
-        return 'factories';
+        return 'cars';
     }
 
     public static function attributes(): array
     {
         return [
-            'name' => 'Manager of Factories',
+            'name' => 'Factory of Cars',
         ];
     }
 
@@ -24,6 +24,6 @@ class FactoryManager extends BaseManager implements HandlerInterface
      */
     public function getPath(): string
     {
-        return 'Factories';
+        return 'Cars';
     }
 }

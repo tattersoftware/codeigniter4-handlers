@@ -12,16 +12,16 @@ final class SearchTest extends TestCase
         $this->expectException('UnexpectedValueException');
         $this->expectExceptionMessage('# is not a valid criteria operator');
 
-        $this->manager
+        $this->factory
             ->where(['cost #' => 42])
             ->findAll();
     }
 
     public function testWhereFilters()
     {
-        $expected = ['Tests\Support\Factories\WidgetFactory'];
+        $expected = ['Tests\Support\Cars\WidgetCar'];
 
-        $result = $this->manager
+        $result = $this->factory
             ->where(['uid' => 'widget'])
             ->findAll();
 
@@ -30,9 +30,9 @@ final class SearchTest extends TestCase
 
     public function testWhereUsesOperators()
     {
-        $expected = ['Tests\Support\Factories\WidgetFactory'];
+        $expected = ['Tests\Support\Cars\WidgetCar'];
 
-        $result = $this->manager
+        $result = $this->factory
             ->where(['cost >' => 5])
             ->findAll();
 
@@ -41,9 +41,9 @@ final class SearchTest extends TestCase
 
     public function testWhereSupportsCsv()
     {
-        $expected = ['Tests\Support\Factories\WidgetFactory'];
+        $expected = ['Tests\Support\Cars\WidgetCar'];
 
-        $result = $this->manager
+        $result = $this->factory
             ->where(['list has' => 'three'])
             ->findAll();
 
@@ -52,7 +52,7 @@ final class SearchTest extends TestCase
 
     public function testWhereMissingAttribute()
     {
-        $result = $this->manager
+        $result = $this->factory
             ->where(['foo' => 'bar'])
             ->findAll();
 
@@ -61,9 +61,9 @@ final class SearchTest extends TestCase
 
     public function testOrWhereIgnoresOtherFilters()
     {
-        $expected = ['Tests\Support\Factories\WidgetFactory'];
+        $expected = ['Tests\Support\Cars\WidgetCar'];
 
-        $result = $this->manager
+        $result = $this->factory
             ->where(['foo' => 'bar'])
             ->orWhere(['uid' => 'widget'])
             ->findAll();
@@ -73,11 +73,11 @@ final class SearchTest extends TestCase
 
     public function testFilterHandlersStopsAtLimit()
     {
-        $expected = ['Tests\Support\Factories\PopFactory'];
+        $expected = ['Tests\Support\Cars\PopCar'];
 
-        $this->manager->where(['cost >=' => 1]);
-		$method = $this->getPrivateMethodInvoker($this->manager, 'filterHandlers');
-		$result = $method(1);
+        $this->factory->where(['cost >=' => 1]);
+        $method = $this->getPrivateMethodInvoker($this->factory, 'filterHandlers');
+        $result = $method(1);
 
         $this->assertSame($expected, $result);
     }
@@ -87,11 +87,11 @@ final class SearchTest extends TestCase
     public function testFindAllDiscoversAll()
     {
         $expected = [
-            'Tests\Support\Factories\PopFactory',
-            'Tests\Support\Factories\WidgetFactory',
+            'Tests\Support\Cars\PopCar',
+            'Tests\Support\Cars\WidgetCar',
         ];
 
-        $result = $this->manager->findAll();
+        $result = $this->factory->findAll();
 
         $this->assertSame($expected, $result);
     }
@@ -99,55 +99,55 @@ final class SearchTest extends TestCase
     public function testFindAllRespectsFilters()
     {
         $expected = [
-            'Tests\Support\Factories\WidgetFactory',
+            'Tests\Support\Cars\WidgetCar',
         ];
 
-        $result = $this->manager->where(['uid' => 'widget'])->findAll();
+        $result = $this->factory->where(['uid' => 'widget'])->findAll();
 
         $this->assertSame($expected, $result);
     }
 
     public function testFindAllResetsFilters()
     {
-        $this->manager->where(['uid' => 'widget'])->findAll();
+        $this->factory->where(['uid' => 'widget'])->findAll();
 
-        $result = $this->getPrivateProperty($this->manager, 'filters');
+        $result = $this->getPrivateProperty($this->factory, 'filters');
 
         $this->assertSame([], $result);
     }
 
     public function testFirstReturnsSingleton()
     {
-        $expected = 'Tests\Support\Factories\PopFactory';
+        $expected = 'Tests\Support\Cars\PopCar';
 
-        $result = $this->manager->first();
+        $result = $this->factory->first();
 
         $this->assertSame($expected, $result);
     }
 
     public function testFirstRespectsFilters()
     {
-        $expected = 'Tests\Support\Factories\WidgetFactory';
+        $expected = 'Tests\Support\Cars\WidgetCar';
 
-        $result = $this->manager->where(['uid' => 'widget'])->first();
+        $result = $this->factory->where(['uid' => 'widget'])->first();
 
         $this->assertSame($expected, $result);
     }
 
     public function testFirstResetsFilters()
     {
-        $this->manager->where(['uid' => 'widget'])->first();
+        $this->factory->where(['uid' => 'widget'])->first();
 
-        $result = $this->getPrivateProperty($this->manager, 'filters');
+        $result = $this->getPrivateProperty($this->factory, 'filters');
 
         $this->assertSame([], $result);
     }
 
     public function testFind()
     {
-        $expected = 'Tests\Support\Factories\PopFactory';
+        $expected = 'Tests\Support\Cars\PopCar';
 
-        $result = $this->manager->find('pop');
+        $result = $this->factory->find('pop');
 
         $this->assertSame($expected, $result);
     }
@@ -165,7 +165,7 @@ final class SearchTest extends TestCase
     {
         $criterium = 'cost ' . $operator;
 
-        $result = $this->manager->where([$criterium => $input])->first();
+        $result = $this->factory->where([$criterium => $input])->first();
 
         $this->assertSame($expected, $result);
     }
@@ -173,15 +173,15 @@ final class SearchTest extends TestCase
     public function operatorProvider()
     {
         return [
-            ['==', '1', 'Tests\Support\Factories\PopFactory'],
-            ['==', 1, 'Tests\Support\Factories\PopFactory'],
-            ['=', 1, 'Tests\Support\Factories\PopFactory'],
-            ['=', true, 'Tests\Support\Factories\PopFactory'],
-            ['===', 1, 'Tests\Support\Factories\PopFactory'],
-            ['>', 1, 'Tests\Support\Factories\WidgetFactory'],
-            ['>=', 1, 'Tests\Support\Factories\PopFactory'],
-            ['<', 10, 'Tests\Support\Factories\PopFactory'],
-            ['<=', 10, 'Tests\Support\Factories\PopFactory'],
+            ['==', '1', 'Tests\Support\Cars\PopCar'],
+            ['==', 1, 'Tests\Support\Cars\PopCar'],
+            ['=', 1, 'Tests\Support\Cars\PopCar'],
+            ['=', true, 'Tests\Support\Cars\PopCar'],
+            ['===', 1, 'Tests\Support\Cars\PopCar'],
+            ['>', 1, 'Tests\Support\Cars\WidgetCar'],
+            ['>=', 1, 'Tests\Support\Cars\PopCar'],
+            ['<', 10, 'Tests\Support\Cars\PopCar'],
+            ['<=', 10, 'Tests\Support\Cars\PopCar'],
         ];
     }
 }
