@@ -71,6 +71,16 @@ abstract class BaseFactory
     }
 
     /**
+     * Returns the interface required for handlers to match.
+     *
+     * @return class-string<HandlerInterface>
+     */
+    public function getInterface(): string
+    {
+        return HandlerInterface::class;
+    }
+
+    /**
      * Returns the current configuration.
      */
     final public function getConfig(): HandlersConfig
@@ -343,8 +353,8 @@ abstract class BaseFactory
     }
 
     /**
-     * Validates that a file path contains a HandlerInterface and
-     * returns its full class name.
+     * Validates that a file path contains a HandlerInterface
+     * (or $this->getInterface()) and returns its full class name.
      *
      * @param string $file      Full path to the file in question
      * @param string $namespace The file's namespace
@@ -380,8 +390,10 @@ abstract class BaseFactory
         if (! $interfaces = class_implements($class)) {
             return null;
         }
-
         if (! in_array(HandlerInterface::class, $interfaces, true)) {
+            return null;
+        }
+        if (! in_array($this->getInterface(), $interfaces, true)) {
             return null;
         }
 
