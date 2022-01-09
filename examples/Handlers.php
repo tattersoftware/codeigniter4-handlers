@@ -12,7 +12,9 @@ namespace Config;
 *
 */
 
-class Handlers extends \Tatter\Handlers\Config\Handlers
+use Tatter\Handlers\Config\Handlers as BaseHandlers;
+
+class Handlers extends BaseHandlers
 {
     /**
      * Classes to ignore across all handlers.
@@ -20,13 +22,6 @@ class Handlers extends \Tatter\Handlers\Config\Handlers
      * @var array<string>
      */
     public $ignoredClasses = [];
-
-    /**
-     * Paths to check during automatic discovery.
-     *
-     * @var array<string>
-     */
-    public $autoDiscover = [];
 
     /**
      * Number of seconds to cache discovered handlers.
