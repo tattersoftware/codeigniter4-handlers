@@ -4,6 +4,7 @@ namespace Tests\Support;
 
 use CodeIgniter\Test\CIUnitTestCase;
 use Tests\Support\Factories\CarFactory;
+use Tests\Support\Factories\ErrorFactory;
 
 /**
  * @internal
@@ -25,5 +26,8 @@ abstract class TestCase extends CIUnitTestCase
         $config                = config('Handlers');
         $config->cacheDuration = null;
         $this->factory         = new CarFactory($config);
+
+        // Skip the erroneous handler until testing it specifically
+        $config->ignoredClasses = [ErrorFactory::class];
     }
 }
