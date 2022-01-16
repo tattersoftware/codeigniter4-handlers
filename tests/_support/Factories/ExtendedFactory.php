@@ -6,13 +6,17 @@ use Tests\Support\Interfaces\ExtendedInterface;
 
 class ExtendedFactory extends CarFactory
 {
+    public const RETURN_TYPE = ExtendedInterface::class;
+
     public static function handlerId(): string
     {
         return 'extended';
     }
 
-    public function getInterface(): string
+    public static function attributes(): array
     {
-        return ExtendedInterface::class;
+        return [
+            'name' => 'Factory of Extended Cars',
+        ];
     }
 }

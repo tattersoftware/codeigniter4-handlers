@@ -3,6 +3,7 @@
 namespace Tatter\Handlers;
 
 use CodeIgniter\Cache\CacheInterface;
+use CodeIgniter\Config\Factories;
 use Tatter\Handlers\Config\Handlers as HandlersConfig;
 use Tatter\Handlers\Interfaces\HandlerInterface;
 use Throwable;
@@ -10,6 +11,8 @@ use UnexpectedValueException;
 
 abstract class BaseFactory
 {
+    public const RETURN_TYPE = HandlerInterface::class;
+
     /**
      * The configuration.
      */
@@ -45,6 +48,28 @@ abstract class BaseFactory
      */
     abstract public function getPath(): string;
 
+    //--------------------------------------------------------------------
+    // HandlerInterface Methods
+    //--------------------------------------------------------------------
+
+    /**
+     * Use Factories-style class basenames to
+     * guesstimate a good handlerId.
+     */
+    public static function handlerId(): string
+    {
+        return str_replace('factory', '', strtolower(Factories::getBasename(static::class)));
+    }
+
+    public static function attributes(): array
+    {
+        return [
+            'name' => ucfirst(static::handlerId() . ' Factory'),
+        ];
+    }
+
+    //--------------------------------------------------------------------
+
     /**
      * Initializes the library.
      *
@@ -62,16 +87,6 @@ abstract class BaseFactory
         $this->cacheKey = 'handlers-' . mb_url_title($path, '-', true);
 
         $this->discoverHandlers();
-    }
-
-    /**
-     * Returns the interface required for handlers to match.
-     *
-     * @return class-string<HandlerInterface>
-     */
-    public function getInterface(): string
-    {
-        return HandlerInterface::class;
     }
 
     /**
@@ -348,7 +363,7 @@ abstract class BaseFactory
 
     /**
      * Validates that a file path contains a HandlerInterface
-     * (or $this->getInterface()) and returns its full class name.
+     * (and optional RETURN_TYPE) and returns its full class name.
      *
      * @param string $file      Full path to the file in question
      * @param string $namespace The file's namespace
@@ -381,13 +396,11 @@ abstract class BaseFactory
         }
 
         // Verify the HandlerInterface
-        if (! $interfaces = class_implements($class)) {
+        if (! is_subclass_of($class, HandlerInterface::class)) {
             return null;
         }
-        if (! in_array(HandlerInterface::class, $interfaces, true)) {
-            return null;
-        }
-        if (! in_array($this->getInterface(), $interfaces, true)) {
+        // Verify the RETURN_TYPE, if set
+        if (! empty(static::RETURN_TYPE) && ! is_a($class, static::RETURN_TYPE, true)) {
             return null;
         }
 
