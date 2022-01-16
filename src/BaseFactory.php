@@ -230,7 +230,7 @@ abstract class BaseFactory
 
         $classes = [];
 
-        foreach ($this->discovered as $handlerId => $attributes) {
+        foreach ($this->discovered as $attributes) {
             $result = true;
 
             // Check each attribute against the filters
@@ -337,8 +337,8 @@ abstract class BaseFactory
                 $handlerId  = $class::handlerId();
                 $attributes = $class::attributes();
 
-                $attributes['id']    = $attributes['id'] ?? $handlerId;
-                $attributes['class'] = $attributes['class'] ?? $class; // @phpstan-ignore-line
+                $attributes['id'] ??= $handlerId;
+                $attributes['class'] ??= $class; // @phpstan-ignore-line
 
                 $this->discovered[$handlerId] = $attributes;
             }
