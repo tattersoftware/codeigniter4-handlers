@@ -13,16 +13,13 @@ use Tatter\Handlers\Interfaces\HandlerInterface;
  */
 class FactoryFactory extends BaseFactory implements HandlerInterface
 {
+    /**
+     * Use Factories-style class basenames to
+     * guesstimate a good handlerId.
+     */
     public static function handlerId(): string
     {
-        return 'factories';
-    }
-
-    public static function attributes(): array
-    {
-        return [
-            'name' => 'Factory of Factories',
-        ];
+        return 'factory';
     }
 
     /**

@@ -47,8 +47,8 @@ Supply the following static methods then implement `Tatter\Handlers\Interfaces\H
 * `public static handlerId(): string`: Returns a unique slug identifier for this class
 * `public static attributes(): array`: Returns an array of attributes about this handler
 
-If you would like to filter by a more specific version you may supply an extended version
-of `HandlerInterface` via the method `BaseFactory::getInterface(): string`.
+If you would like to filter by a more specific version you may supply an additional class
+or interface name as the Factory class constant `RETURN_TYPE`.
 
 > Note: See **src/Interfaces/HandlerInterface.php** for more details.
 
@@ -97,19 +97,11 @@ $class = $widgets->find('FancyHandler');
 ```
 
 If you want your Factory to search for a more specific interface then add the class string
-as a return from your Factory's `getInterface()` method:
+to the class constant `RETURN_TYPE`:
 ```php
 class WidgetFactory extends BaseFactory
 {
-    /**
-     * Returns the interface required for handlers to match.
-     *
-     * @return class-string<HandlerInterface>
-     */
-    public function getInterface(): string
-    {
-        return 'App\Interfaces\WidgetInterface';
-    }
+    public const RETURN_TYPE = 'App\Interfaces\WidgetInterface';
 ...
 ```
 
@@ -122,10 +114,10 @@ using the config file by setting `$cacheDuration` to `null`.
 
 Often it is a good idea to pre-cache handlers so the filesystem search does not happen on
 an actual page load. This library includes `FactoryFactory`, a "Factory to discover other
-Factories". if you would like your Factories to be discoverable by `FactoryFactory` and
+Factories". If you would like your Factories to be discoverable by `FactoryFactory` and
 thus their handlers enabled for auto-caching then place your Factory classes in the
-**Factories** subfolder and have them fulfill the `HandlerInterface` methods just like any
-other handlers.
+**Factories** subfolder. Factories autodetect their attributes for `HandlerInterface` but
+you may supply the overriding methods just like any other handlers.
 
 ### Commands
 

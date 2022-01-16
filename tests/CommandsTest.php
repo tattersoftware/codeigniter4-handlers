@@ -55,7 +55,7 @@ final class CommandsTest extends TestCase
 
         $result = cache()->get('handlers-factories');
         $this->assertCount(3, $result);
-        $this->assertSame(['cars', 'extended', 'factories'], array_keys($result));
+        $this->assertSame(['car', 'extended', 'factory'], array_keys($result));
 
         $result = cache()->get('handlers-cars');
         $this->assertCount(2, $result);
