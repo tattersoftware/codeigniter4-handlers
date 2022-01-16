@@ -9,7 +9,7 @@ use Tatter\Handlers\Interfaces\HandlerInterface;
 use Throwable;
 use UnexpectedValueException;
 
-abstract class BaseFactory
+abstract class BaseFactory implements HandlerInterface
 {
     public const RETURN_TYPE = HandlerInterface::class;
 

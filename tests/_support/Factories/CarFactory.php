@@ -3,9 +3,8 @@
 namespace Tests\Support\Factories;
 
 use Tatter\Handlers\BaseFactory;
-use Tatter\Handlers\Interfaces\HandlerInterface;
 
-class CarFactory extends BaseFactory implements HandlerInterface
+class CarFactory extends BaseFactory
 {
     /**
      * Returns the search path.
