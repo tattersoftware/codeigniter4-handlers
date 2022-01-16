@@ -12,31 +12,25 @@ abstract class BaseFactory
 {
     /**
      * The configuration.
-     *
-     * @var HandlersConfig
      */
-    protected $config;
+    protected HandlersConfig $config;
 
     /**
      * The Cache handler instance.
-     *
-     * @var CacheInterface|null
      */
-    protected $cache;
+    protected ?CacheInterface $cache = null;
 
     /**
      * The cache key to use.
-     *
-     * @var string
      */
-    protected $cacheKey;
+    protected string $cacheKey;
 
     /**
      * Array of filters.
      *
      * @var array of [key, operator, value, combine]
      */
-    protected $filters = [];
+    protected array $filters = [];
 
     /**
      * Array of discovered handler attributes,
@@ -44,7 +38,7 @@ abstract class BaseFactory
      *
      * @var array<string, array>
      */
-    protected $discovered = [];
+    protected array $discovered = [];
 
     /**
      * Returns the search path.
