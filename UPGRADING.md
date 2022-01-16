@@ -5,6 +5,7 @@
 
 Version 3 focuses on simplifying the code and making each class align more logically with what it does.
 
+* Minimum PHP version has been bumped to `7.4` to match the upcoming framework changes
 * All properties that can be typed have been
 * `Handlers` has been refactored into `BaseFactory`; read more below
 * Related, the following have been removed: Handlers service, helper file, and command files
