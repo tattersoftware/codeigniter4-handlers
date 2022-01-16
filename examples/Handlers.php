@@ -21,13 +21,11 @@ class Handlers extends BaseHandlers
      *
      * @var array<string>
      */
-    public $ignoredClasses = [];
+    public array $ignoredClasses = [];
 
     /**
      * Number of seconds to cache discovered handlers.
      * Null disables caching
-     *
-     * @var int|null
      */
-    public $cacheDuration = DAY;
+    public ?int $cacheDuration = DAY;
 }

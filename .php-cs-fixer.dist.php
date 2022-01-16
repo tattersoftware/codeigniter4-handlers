@@ -6,11 +6,16 @@ use PhpCsFixer\Finder;
 
 $finder = Finder::create()
     ->files()
-    ->in(__DIR__)
+    ->in([
+        __DIR__ . '/src/',
+        __DIR__ . '/tests/',
+    ])
     ->exclude('build')
     ->append([__FILE__]);
 
-$overrides = [];
+$overrides = [
+    'phpdoc_to_property_type' => true,
+];
 
 $options = [
     'finder'    => $finder,

@@ -12,31 +12,25 @@ abstract class BaseFactory
 {
     /**
      * The configuration.
-     *
-     * @var HandlersConfig
      */
-    protected $config;
+    protected HandlersConfig $config;
 
     /**
      * The Cache handler instance.
-     *
-     * @var CacheInterface|null
      */
-    protected $cache;
+    protected ?CacheInterface $cache = null;
 
     /**
      * The cache key to use.
-     *
-     * @var string
      */
-    protected $cacheKey;
+    protected string $cacheKey;
 
     /**
      * Array of filters.
      *
      * @var array of [key, operator, value, combine]
      */
-    protected $filters = [];
+    protected array $filters = [];
 
     /**
      * Array of discovered handler attributes,
@@ -44,7 +38,7 @@ abstract class BaseFactory
      *
      * @var array<string, array>
      */
-    protected $discovered = [];
+    protected array $discovered = [];
 
     /**
      * Returns the search path.
@@ -230,7 +224,7 @@ abstract class BaseFactory
 
         $classes = [];
 
-        foreach ($this->discovered as $handlerId => $attributes) {
+        foreach ($this->discovered as $attributes) {
             $result = true;
 
             // Check each attribute against the filters
@@ -337,8 +331,8 @@ abstract class BaseFactory
                 $handlerId  = $class::handlerId();
                 $attributes = $class::attributes();
 
-                $attributes['id']    = $attributes['id'] ?? $handlerId;
-                $attributes['class'] = $attributes['class'] ?? $class; // @phpstan-ignore-line
+                $attributes['id'] ??= $handlerId;
+                $attributes['class'] ??= $class; // @phpstan-ignore-line
 
                 $this->discovered[$handlerId] = $attributes;
             }

@@ -13,10 +13,8 @@ abstract class TestCase extends CIUnitTestCase
 {
     /**
      * The configuration.
-     *
-     * @var CarFactory
      */
-    protected $factory;
+    protected CarFactory $factory;
 
     protected function setUp(): void
     {

@@ -5,11 +5,12 @@
 
 Version 3 focuses on simplifying the code and making each class align more logically with what it does.
 
+* All properties that can be typed have been
 * `Handlers` has been refactored into `BaseFactory`; read more below
 * Related, the following have been removed: Handlers service, helper file, and command files
 * The `$attributes` property and accessor methods have been replaced by a single static method: `attributes()`
 * Identification of handlers is now handled via the static method `handlerId()` instead of the "name" or "uid" attributes, or the class itself
-* THe "auto-discovery" feature is removed; read the docs on creating discovery-compatible factories instead
+* The "auto-discovery" feature is removed; read the docs on creating discovery-compatible factories instead
 
 ### `BaseFactory`
 
