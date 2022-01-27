@@ -2,7 +2,7 @@
 
 namespace Tests\Support\Cars;
 
-class PopCar implements CarInterface
+class CollisionCar implements CarInterface
 {
     public const HANDLER_ID = 'pop';
 }

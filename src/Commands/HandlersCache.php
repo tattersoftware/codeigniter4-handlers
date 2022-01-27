@@ -16,27 +16,24 @@ class HandlersCache extends BaseCommand
 
     public function run(array $params = [])
     {
-        // Load the Factories of Factories
-        $factories = new FactoryFactory();
-
         // Make sure caching is enabled
-        if ($factories->getConfig()->cacheDuration === null) {
+        if (config('Handlers')->cacheDuration === null) {
             CLI::error('Handler caching is disabled by the Tatter\Handlers Config file.');
 
             return;
         }
 
-        // Create each Factory, triggering its discovery and subsequent caching
+        // Use the Factory of Factories to locate compatible Factories
         $count  = 0;
         $errors = 0;
 
-        foreach ($factories->findAll() as $factory) {
+        foreach (FactoryFactory::findAll() as $factory) {
+
+            // Run each factory's discover to trigger its cache commit
             try {
-                new $factory();
+                $factory::findAll();
                 $count++;
-            }
-            // @phpstan-ignore-next-line
-            catch (Throwable $e) {
+            } catch (Throwable $e) {
                 $errors++;
                 $this->showError($e);
             }
@@ -48,7 +45,6 @@ class HandlersCache extends BaseCommand
             return;
         }
 
-        // @phpstan-ignore-next-line
         if ($errors > 0) {
             CLI::error('Total errors encountered: ' . $errors);
         }
