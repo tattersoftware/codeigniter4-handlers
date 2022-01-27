@@ -29,6 +29,9 @@
         "codeigniter4/framework": "^4.1"
     },
     "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        },
         "optimize-autoloader": true,
         "sort-packages": true
     },
@@ -55,8 +58,8 @@
             "@analyze",
             "@test",
             "@inspect",
-            "@style",
-            "rector process -vv"
+            "rector process",
+            "@style"
         ],
         "deduplicate": "phpcpd app/ src/",
         "inspect": "deptrac analyze --cache-file=build/deptrac.cache",
