@@ -1,7 +1,7 @@
 {
     "name": "tatter/handlers",
     "type": "library",
-    "description": "Cross-module handler registration, for CodeIgniter 4",
+    "description": "Handler discovery and management, for CodeIgniter 4",
     "keywords": [
         "codeigniter",
         "codeigniter4",

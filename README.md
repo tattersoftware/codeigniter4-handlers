@@ -1,5 +1,5 @@
 # Tatter\Handlers
-Cross-module handler management, for CodeIgniter 4
+Handler discovery and management, for CodeIgniter 4
 
 [![](https://github.com/tattersoftware/codeigniter4-handlers/workflows/PHPUnit/badge.svg)](https://github.com/tattersoftware/codeigniter4-handlers/actions/workflows/test.yml)
 [![](https://github.com/tattersoftware/codeigniter4-handlers/workflows/PHPStan/badge.svg)](https://github.com/tattersoftware/codeigniter4-handlers/actions/workflows/analyze.yml)
@@ -9,13 +9,13 @@ Cross-module handler management, for CodeIgniter 4
 ## Quick Start
 
 1. Install with Composer: `> composer require tatter/handlers`
-2. Load the library with the handler path: `$handlers = new \Tatter\Handlers\Handlers('Thumbnails');`
-2. Discover classes from any namespace: `$classes = $handlers->findAll();`
+2. Create a Factory to identify your handlers
+2. Discover classes from any namespace: `$widgets = WidgetFactory::findAll();`
 
 ## Features
 
-**Handlers** allows developers to define and discover classes of predetermined types across
-all namespaces by a variety of attributes: "a database-free model for classes".
+**Handlers** allows developers to define and discover classes of predetermined types
+across all namespaces; it is essentially a database-free "model" for classes.
 
 ## Installation
 
@@ -38,71 +38,52 @@ in the comments. If no config file is found in **app/Config** the library will u
 
 **Handlers** uses relative paths to discover files that contain handler classes. Create a
 new folder in your project or module with an appropriate name for your implementation,
-e.g. **app/Widgets/** or **src/Invoices**.
+e.g. **app/Widgets/** or **src/Reports**.
 
-### Interfaces
+### Compatibility
 
-In order for them be discovered as handlers, your classes need to implement the interface.
+In order for them be discovered as handlers your classes need to have a consistent class or
+interface type and supply a unique ID via the class constant `HANDLER_ID`.
 Supply the following static methods then implement `Tatter\Handlers\Interfaces\HandlerInterface`.
-* `public static handlerId(): string`: Returns a unique slug identifier for this class
-* `public static attributes(): array`: Returns an array of attributes about this handler
 
-If you would like to filter by a more specific version you may supply an additional class
-or interface name as the Factory class constant `RETURN_TYPE`.
-
-> Note: See **src/Interfaces/HandlerInterface.php** for more details.
+**Handlers** will resolve class extensions by using this handler ID, so if you want your
+app to "replace" a handler from another namespace then simply extend the original class and
+leave the `HANDLER_ID` constant the same.
 
 ### Factories
 
-Once your handler classes are set up you will need to create a Factory that provides the
-lookup path and (optional) interface to identify the handlers. Create the new class and
-and extend `BaseFactory`:
+Once your handler classes are created you will need a Factory that provides the lookup path
+and expected class or interface to identify the handlers. Create the new class extending `BaseFactory`:
 ```php
 <?php
 
 namespace App\Factories;
 
+use App\Interfaces\WidgetInterface;
 use Tatter\Handlers\BaseFactory;
 
 class WidgetFactory extends BaseFactory
 {
-    /**
-     * Returns the search path.
-     */
-    public function getPath(): string
-    {
-        return 'Widgets';
-    }
+    public const HANDLER_PATH = 'Widgets';
+    public const HANDLER_TYPE = WidgetInterface::class;
 }
 ```
 
-You can then use the `BaseFactory` methods to locate all handler classes, or a subset of
-classes based on their attributes:
+You can then use the `BaseFactory` methods to locate all handler classes or a specific
+handler by its ID:
 ```php
-$widgets = new WidgetFactory();
+use App\Factories\WidgetFactory;
 
 // Iterate through all discovered handlers
-foreach ($widgets->findAll() as $class)
+foreach (WidgetFactory::findAll() as $class)
 {
     $widget = new $class($param1, $param2);
     $widget->display();
 }
 
-// ... or get a single handler by one of its attributes
-$class = $widgets->where(['color' => 'red'])->first();
-
-// ... or by specifying its handlerId
-$class = $widgets->find('FancyHandler');
+// ... or get a single handler by specifying its ID
+$class = WidgetFactory::find('FancyHandler');
 (new $class)->display();
-```
-
-If you want your Factory to search for a more specific interface then add the class string
-to the class constant `RETURN_TYPE`:
-```php
-class WidgetFactory extends BaseFactory
-{
-    public const RETURN_TYPE = 'App\Interfaces\WidgetInterface';
-...
 ```
 
 ## Caching
@@ -116,8 +97,7 @@ Often it is a good idea to pre-cache handlers so the filesystem search does not 
 an actual page load. This library includes `FactoryFactory`, a "Factory to discover other
 Factories". If you would like your Factories to be discoverable by `FactoryFactory` and
 thus their handlers enabled for auto-caching then place your Factory classes in the
-**Factories** subfolder. Factories autodetect their attributes for `HandlerInterface` but
-you may supply the overriding methods just like any other handlers.
+**Factories** subfolder and provide them a `HANDLER_ID` constant like any other handler.
 
 ### Commands
 
@@ -138,7 +118,7 @@ Set your cron job to run `spark handlers:cache` on some interval smaller than th
 ## Examples
 
 Here are some other libraries that implement their own Factory class with a set of handlers.
-Browse their code to get an idea of how you might use `Handlers` for your own projects.
+Browse their code to get an idea of how you might use **Handlers** for your own projects.
 
 * [Tatter\Thumbnails](https://github.com/tattersoftware/codeigniter4-thumbnails): Modular thumbnail generation, for CodeIgniter 4
 * [Tatter\Exports](https://github.com/tattersoftware/codeigniter4-exports): Modular file exports, for CodeIgniter 4

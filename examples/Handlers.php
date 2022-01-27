@@ -25,7 +25,7 @@ class Handlers extends BaseHandlers
 
     /**
      * Number of seconds to cache discovered handlers.
-     * Null disables caching
+     * Null disables caching.
      */
     public ?int $cacheDuration = DAY;
 }
