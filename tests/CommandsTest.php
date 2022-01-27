@@ -4,7 +4,6 @@ use CodeIgniter\Test\Filters\CITestStreamFilter;
 use Tatter\Handlers\Factories\FactoryFactory;
 use Tests\Support\Factories\CarFactory;
 use Tests\Support\Factories\ErrorFactory;
-use Tests\Support\Factories\ExtendedFactory;
 use Tests\Support\TestCase;
 
 /**
@@ -54,27 +53,27 @@ final class CommandsTest extends TestCase
         command('handlers:cache');
 
         $result = cache()->get('handlers-factories');
-        $this->assertCount(3, $result);
-        $this->assertSame(['car', 'extended', 'factory'], array_keys($result));
+        $this->assertCount(2, $result);
+        $this->assertSame(['car', 'factory'], array_keys($result));
 
         $result = cache()->get('handlers-cars');
         $this->assertCount(2, $result);
-        $this->assertSame('Tests\Support\Cars\PopCar', $result['pop']['class']);
+        $this->assertSame('Tests\Support\Cars\PopCar', $result['pop']);
     }
 
     public function testCacheReportsErrors()
     {
         // Stop ignoring the ErrorFactory
-        config('Handlers')->ignoredClasses = [];
+        unset(config('Handlers')->ignoredClasses[1]);
 
         command('handlers:cache');
 
-        $this->assertStringContainsString('UnexpectedValueException', $this->getBuffer());
+        $this->assertStringContainsString('BadMethodCallException', $this->getBuffer());
         $this->assertStringContainsString('Total errors encountered: 1', $this->getBuffer());
 
         $result = cache()->get('handlers-factories');
-        $this->assertCount(4, $result);
-        $this->assertSame(ErrorFactory::class, $result['error']['class']);
+        $this->assertCount(3, $result);
+        $this->assertSame(ErrorFactory::class, $result['error']);
     }
 
     public function testCacheErrorsNoHandlers()
@@ -83,7 +82,6 @@ final class CommandsTest extends TestCase
         config('Handlers')->ignoredClasses = [
             CarFactory::class,
             ErrorFactory::class,
-            ExtendedFactory::class,
             FactoryFactory::class,
         ];
 

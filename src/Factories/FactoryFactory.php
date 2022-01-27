@@ -12,13 +12,7 @@ use Tatter\Handlers\BaseFactory;
  */
 class FactoryFactory extends BaseFactory
 {
-    public static function handlerId(): string
-    {
-        return 'factory';
-    }
-
-    public function getPath(): string
-    {
-        return 'Factories';
-    }
+    public const HANDLER_ID   = 'factory';
+    public const HANDLER_PATH = 'Factories';
+    public const HANDLER_TYPE = BaseFactory::class;
 }

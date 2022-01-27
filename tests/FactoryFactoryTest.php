@@ -2,7 +2,6 @@
 
 use Tatter\Handlers\Factories\FactoryFactory;
 use Tests\Support\Factories\CarFactory;
-use Tests\Support\Factories\ExtendedFactory;
 use Tests\Support\TestCase;
 
 /**
@@ -12,11 +11,10 @@ final class FactoryFactoryTest extends TestCase
 {
     public function testDiscovers()
     {
-        // Discovery is alphabetical by handlerId
+        // Discovery is alphabetical by ID
         $expected = [
-            CarFactory::class,
-            ExtendedFactory::class,
-            FactoryFactory::class,
+            'car'     => CarFactory::class,
+            'factory' => FactoryFactory::class,
         ];
 
         $factory = new FactoryFactory();

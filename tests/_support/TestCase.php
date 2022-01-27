@@ -3,7 +3,8 @@
 namespace Tests\Support;
 
 use CodeIgniter\Test\CIUnitTestCase;
-use Tests\Support\Factories\CarFactory;
+use Tatter\Handlers\BaseFactory;
+use Tests\Support\Cars\CollisionCar;
 use Tests\Support\Factories\ErrorFactory;
 
 /**
@@ -11,11 +12,6 @@ use Tests\Support\Factories\ErrorFactory;
  */
 abstract class TestCase extends CIUnitTestCase
 {
-    /**
-     * The configuration.
-     */
-    protected CarFactory $factory;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -23,9 +19,15 @@ abstract class TestCase extends CIUnitTestCase
         // Disable caching for most tests
         $config                = config('Handlers');
         $config->cacheDuration = null;
-        $this->factory         = new CarFactory($config);
 
         // Skip the erroneous handler until testing it specifically
-        $config->ignoredClasses = [ErrorFactory::class];
+        $config->ignoredClasses = [CollisionCar::class, ErrorFactory::class];
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        BaseFactory::reset();
     }
 }

@@ -2,18 +2,26 @@
 
 namespace Tests\Support\Factories;
 
-class ErrorFactory extends ExtendedFactory
+use BadMethodCallException;
+use Tatter\Handlers\BaseFactory;
+use Tests\Support\Cars\CarInterface;
+
+/**
+ * Error Factory Class
+ *
+ * Designed to throw an exception during discovery.
+ */
+class ErrorFactory extends BaseFactory
 {
-    public static function handlerId(): string
-    {
-        return 'error';
-    }
+    public const HANDLER_ID   = 'error';
+    public const HANDLER_PATH = 'Fruits';
+    public const HANDLER_TYPE = CarInterface::class;
 
     /**
-     * Returns an erroneous search path.
+     * Returns the cache key for this Factory.
      */
-    public function getPath(): string
+    public static function cacheKey(): string
     {
-        return '';
+        throw new BadMethodCallException('You should not be here!');
     }
 }

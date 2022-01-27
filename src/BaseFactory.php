@@ -2,363 +2,140 @@
 
 namespace Tatter\Handlers;
 
-use CodeIgniter\Cache\CacheInterface;
 use CodeIgniter\Config\Factories;
-use Tatter\Handlers\Config\Handlers as HandlersConfig;
-use Tatter\Handlers\Interfaces\HandlerInterface;
+use RuntimeException;
 use Throwable;
-use UnexpectedValueException;
 
-abstract class BaseFactory implements HandlerInterface
+/**
+ * Abstract Base Factory Class
+ *
+ * An abstract class with common static functions for path-specific
+ * handler discovery.
+ * Required:
+ * - public class constant HANDLER_PATH, the namespace search path
+ * - public class constant HANDLER_TYPE, the class string of the types to discover
+ * Optional, to be included in automated caching:
+ * - public class constant HANDLER_ID, to be included
+ * - place extending classes in the Factories subfolder
+ *
+ * Additionally each handler class must have a string identifier
+ * unique to the discovery path as its public constant HANDLER_ID.
+ */
+abstract class BaseFactory
 {
-    public const RETURN_TYPE = HandlerInterface::class;
+    public const HANDLER_PATH = '';
+    public const HANDLER_TYPE = '';
 
     /**
-     * The configuration.
-     */
-    protected HandlersConfig $config;
-
-    /**
-     * The Cache handler instance.
-     */
-    protected ?CacheInterface $cache = null;
-
-    /**
-     * The cache key to use.
-     */
-    protected string $cacheKey;
-
-    /**
-     * Array of filters.
+     * Array of paths and their discovered handlers.
      *
-     * @var array of [key, operator, value, combine]
+     * @var array<string, array<string, class-string>> [Path => [ID => Class]]
      */
-    protected array $filters = [];
+    private static array $discovered = [];
 
     /**
-     * Array of discovered handler attributes,
-     * indexed by their handlerId.
-     *
-     * @var array<string, array>
+     * Resets discovered handlers. Mostly just for testing.
      */
-    protected array $discovered = [];
-
-    /**
-     * Returns the search path.
-     */
-    abstract public function getPath(): string;
-
-    //--------------------------------------------------------------------
-    // HandlerInterface Methods
-    //--------------------------------------------------------------------
-
-    /**
-     * Use Factories-style class basenames to
-     * guesstimate a good handlerId.
-     */
-    public static function handlerId(): string
+    public static function reset(): void
     {
-        return str_replace('factory', '', strtolower(Factories::getBasename(static::class)));
-    }
-
-    public static function attributes(): array
-    {
-        return [
-            'name' => ucfirst(static::handlerId() . ' Factory'),
-        ];
-    }
-
-    //--------------------------------------------------------------------
-
-    /**
-     * Initializes the library.
-     *
-     * @throws UnexpectedValueException
-     */
-    final public function __construct(?HandlersConfig $config = null)
-    {
-        $this->config = $config ?? config('Handlers');
-
-        $path = $this->getPath();
-        if ($path === '' || strpos($path, DIRECTORY_SEPARATOR) !== false) {
-            throw new UnexpectedValueException('Invalid path provided: ' . $path);
-        }
-
-        $this->cacheKey = 'handlers-' . mb_url_title($path, '-', true);
-
-        $this->discoverHandlers();
-    }
-
-    /**
-     * Returns the current configuration.
-     */
-    final public function getConfig(): HandlersConfig
-    {
-        return $this->config;
-    }
-
-    /**
-     * Returns the attributes for a discovered class.
-     */
-    final public function getAttributes(string $handlerId): ?array
-    {
-        return $this->discovered[$handlerId] ?? null;
-    }
-
-    //--------------------------------------------------------------------
-
-    /**
-     * Adds attribute filters.
-     *
-     * @param array<string, mixed> $criteria
-     *
-     * @return $this
-     */
-    final public function where(array $criteria): self
-    {
-        $this->parseCriteria($criteria, true);
-
-        return $this;
-    }
-
-    /**
-     * Adds attribute filters that do not combine.
-     *
-     * @param array<string, mixed> $criteria
-     *
-     * @return $this
-     */
-    final public function orWhere(array $criteria): self
-    {
-        $this->parseCriteria($criteria, false);
-
-        return $this;
-    }
-
-    /**
-     * Resets filters between returns.
-     *
-     * @return $this
-     */
-    final public function reset(): self
-    {
-        $this->filters = [];
-
-        return $this;
-    }
-
-    /**
-     * Parses "where" $criteria and adds to $filters
-     *
-     * @param array $criteria Array of 'key [operator]' => 'value'
-     * @param bool  $combine  Whether the resulting filter should be combined with others
-     */
-    private function parseCriteria(array $criteria, bool $combine): void
-    {
-        foreach ($criteria as $key => $value) {
-            // Check for an operator
-            $key = trim($key);
-            if (strpos($key, ' ')) {
-                [$key, $operator] = explode(' ', $key);
-            } else {
-                $operator = '==';
-            }
-
-            $this->filters[] = [
-                $key,
-                $operator,
-                $value,
-                $combine,
-            ];
+        if (static::HANDLER_PATH !== '') {
+            unset(self::$discovered[static::HANDLER_PATH]);
+        } else {
+            self::$discovered = [];
         }
     }
 
-    //--------------------------------------------------------------------
-
     /**
-     * Returns the first matched class. Short-circuits the namespace
-     * traversal to optimize performance.
+     * Returns a handler by its ID.
      *
-     * @return class-string<HandlerInterface>|null The full class name, or null if none found
+     * @throws RuntimeException If a handler mathcing the ID was not found.
+     *
+     * @return class-string
      */
-    final public function first(): ?string
+    final public static function find(string $id): string
     {
-        $class = $this->filterHandlers()[0] ?? null;
-        $this->reset();
+        $handlers = self::findAll();
 
-        return $class;
-    }
-
-    /**
-     * Returns an array of all matched classes.
-     *
-     * @return class-string<HandlerInterface>[]
-     */
-    final public function findAll(): array
-    {
-        $classes = $this->filterHandlers();
-        $this->reset();
-
-        return $classes;
-    }
-
-    /**
-     * Returns a handler by its handlerId. Ignores filters.
-     *
-     * @return class-string<HandlerInterface>|null The full class name, or null if none found
-     */
-    final public function find(string $handlerId): ?string
-    {
-        return $this->discovered[$handlerId]['class'] ?? null;
-    }
-
-    //--------------------------------------------------------------------
-
-    /**
-     * Filters discovered classes by the defined criteria.
-     *
-     * @param int|null $limit Limit on how many classes to match
-     *
-     * @throws UnexpectedValueException
-     *
-     * @return class-string<HandlerInterface>[]
-     */
-    final protected function filterHandlers(?int $limit = null): array
-    {
-        // Make sure there is work to do
-        if ($this->discovered === []) {
-            return [];
+        if (! isset($handlers[$id])) {
+            throw new RuntimeException('Unknown handler "' . $id . '" for ' . static::class);
         }
 
-        // If there are no filters then grab all classes
-        if ($this->filters === []) {
-            $classes = array_column($this->discovered, 'class');
-
-            return $limit ? array_slice($classes, 0, $limit) : $classes;
-        }
-
-        $classes = [];
-
-        foreach ($this->discovered as $attributes) {
-            $result = true;
-
-            // Check each attribute against the filters
-            foreach ($this->filters as $filter) {
-                // Split out the array to make it easier to read
-                [$key, $operator, $value, $combine] = $filter;
-
-                if (! isset($attributes[$key])) {
-                    $result = false;
-
-                    continue;
-                }
-
-                switch ($operator) {
-                    case '==':
-                    case '=':
-                        $test = (string) $attributes[$key] === (string) $value;
-                    break;
-
-                    case '===':
-                        $test = $attributes[$key] === $value;
-                    break;
-
-                    case '>':
-                        $test = $attributes[$key] > $value;
-                    break;
-
-                    case '>=':
-                        $test = $attributes[$key] >= $value;
-                    break;
-
-                    case '<':
-                        $test = $attributes[$key] < $value;
-                    break;
-
-                    case '<=':
-                        $test = $attributes[$key] <= $value;
-                    break;
-
-                    // Requires the attribute to be a CSV
-                    case 'has':
-                        $test = in_array($value, explode(',', $attributes[$key]), true);
-                    break;
-
-                    default:
-                        throw new UnexpectedValueException($operator . ' is not a valid criteria operator');
-                }
-
-                // If this filter was sufficient on its own then skip the rest of the filters
-                if ($test && ! $combine) {
-                    $result = true;
-                    break;
-                }
-
-                $result = $result && $test;
-            }
-
-            // Check for a match
-            if ($result) {
-                $classes[] = $attributes['class'];
-
-                if ($limit && count($classes) >= $limit) {
-                    return $classes;
-                }
-            }
-        }
-
-        return $classes;
+        return $handlers[$id];
     }
 
     /**
-     * Iterates through namespaces and finds HandlerInterfaces in the search path.
+     * Returns an array of all discovered handlers
+     * classes indexed by ID.
+     *
+     * @return array<string, class-string>
      */
-    private function discoverHandlers(): void
+    final public static function findAll(): array
+    {
+        if (! isset(self::$discovered[static::HANDLER_PATH])) {
+            self::discover();
+        }
+
+        return self::$discovered[static::HANDLER_PATH];
+    }
+
+    /**
+     * Iterates through namespaces and finds classes
+     * matching HANDLER_TYPE in the search path.
+     *
+     * @throws RuntimeException For unrelated handlers having ID collision
+     */
+    private static function discover(): void
     {
         // Check the cache first
-        if ($this->restoreCache()) {
+        if (self::restoreCache()) {
             return;
         }
 
-        $path = $this->getPath();
-        service('timer')->start('Discover ' . $path);
+        service('timer')->start('Discover ' . static::HANDLER_PATH);
 
         // Have to do this the hard way
         $locator = service('locator');
+        $ignored = config('Handlers')->ignoredClasses;
 
         // Scan each namespace
-        $this->discovered = [];
+        self::$discovered[static::HANDLER_PATH] = [];
 
         foreach (service('autoloader')->getNamespace() as $namespace => $paths) {
             // Check for files in the path for this namespace
-            foreach ($locator->listNamespaceFiles($namespace, $path) as $file) {
+            foreach ($locator->listNamespaceFiles($namespace, static::HANDLER_PATH) as $file) {
                 // Try to get the class name
-                if (! $class = $this->getHandlerClass($file, $namespace)) {
+                if (! $class = self::getHandlerClass($file, $namespace)) {
                     continue;
                 }
 
-                // Make sure it is not an ignored class
-                if (in_array($class, $this->config->ignoredClasses, true)) {
+                // Skip ignored classes
+                if (in_array($class, $ignored, true)) {
                     continue;
                 }
 
-                // A match! Get the instance attributes
-                $handlerId  = $class::handlerId();
-                $attributes = $class::attributes();
+                // A match! Get the ID
+                $id = $class::HANDLER_ID;
 
-                $attributes['id'] ??= $handlerId;
-                $attributes['class'] ??= $class; // @phpstan-ignore-line
+                // If no overlap, or if the new class is a child of the current then store and move on
+                if (! isset(self::$discovered[static::HANDLER_PATH][$id]) || is_a($class, self::$discovered[static::HANDLER_PATH][$id], true)) {
+                    self::$discovered[static::HANDLER_PATH][$id] = $class;
 
-                $this->discovered[$handlerId] = $attributes;
+                    continue;
+                }
+
+                // If the classes are not related then it is a conflict
+                if (! is_a(self::$discovered[static::HANDLER_PATH][$id], $class, true)) {
+                    throw new RuntimeException('Handlers have conflicting ID "' . $id . '": ' . self::$discovered[static::HANDLER_PATH][$id] . ', ' . $class);
+                }
             }
         }
 
-        ksort($this->discovered, SORT_STRING);
+        ksort(self::$discovered[static::HANDLER_PATH], SORT_STRING);
 
         // Cache the results
-        $this->commitCache();
+        self::commitCache();
 
-        service('timer')->stop('Discover ' . $path);
+        service('timer')->stop('Discover ' . static::HANDLER_PATH);
     }
 
     /**
@@ -369,8 +146,10 @@ abstract class BaseFactory implements HandlerInterface
      * @param string $namespace The file's namespace
      *
      * @return string|null The fully-namespaced class
+     *
+     * @internal
      */
-    final public function getHandlerClass(string $file, string $namespace): ?string
+    final public static function getHandlerClass(string $file, string $namespace): ?string
     {
         // Skip non-PHP files
         if (substr($file, -4) !== '.php') {
@@ -388,19 +167,20 @@ abstract class BaseFactory implements HandlerInterface
         // @codeCoverageIgnoreEnd
 
         // Build the fully-namespaced class
-        $class = $namespace . '\\' . $this->getPath() . '\\' . basename($file, '.php');
+        $class = $namespace . '\\' . static::HANDLER_PATH . '\\' . basename($file, '.php');
 
         // Verify that the class is available
         if (! class_exists($class, false)) {
             return null;
         }
 
-        // Verify the HandlerInterface
-        if (! is_subclass_of($class, HandlerInterface::class)) {
+        // Must have a HANDLER_ID to count
+        if (! defined("{$class}::HANDLER_ID")) {
             return null;
         }
-        // Verify the RETURN_TYPE, if set
-        if (! empty(static::RETURN_TYPE) && ! is_a($class, static::RETURN_TYPE, true)) {
+
+        // Verify the HANDLER_TYPE
+        if (! is_a($class, static::HANDLER_TYPE, true)) {
             return null;
         }
 
@@ -410,12 +190,30 @@ abstract class BaseFactory implements HandlerInterface
     //--------------------------------------------------------------------
 
     /**
+     * Returns the cache key for this Factory.
+     */
+    public static function cacheKey(): string
+    {
+        return 'handlers-' . mb_url_title(static::HANDLER_PATH, '-', true);
+    }
+
+    /**
+     * Removes discovered classes from the cache.
+     */
+    final public static function clearCache(): void
+    {
+        cache()->delete(static::cacheKey());
+    }
+
+    /**
      * Commits discovered classes to the cache. Called after discovery.
      */
-    final protected function commitCache(): void
+    final protected static function commitCache(): void
     {
-        if ($this->config->cacheDuration !== null) {
-            cache()->save($this->cacheKey, $this->discovered, $this->config->cacheDuration);
+        $config = config('Handlers');
+
+        if ($config->cacheDuration !== null) {
+            cache()->save(static::cacheKey(), self::$discovered[static::HANDLER_PATH], $config->cacheDuration);
         }
     }
 
@@ -424,30 +222,18 @@ abstract class BaseFactory implements HandlerInterface
      *
      * @return bool Whether there was cache content to restore
      */
-    final protected function restoreCache(): bool
+    final protected static function restoreCache(): bool
     {
-        if ($this->config->cacheDuration === null) {
+        if (config('Handlers')->cacheDuration === null) {
             return false;
         }
 
-        if (null === $discovered = cache($this->cacheKey)) {
+        if (null === $handlers = cache(static::cacheKey())) {
             return false;
         }
 
-        $this->discovered = $discovered;
+        self::$discovered[static::HANDLER_PATH] = $handlers;
 
         return true;
-    }
-
-    /**
-     * Removes discovered classes from the cache.
-     *
-     * @return $this
-     */
-    final public function clearCache(): self
-    {
-        cache()->delete($this->cacheKey);
-
-        return $this;
     }
 }

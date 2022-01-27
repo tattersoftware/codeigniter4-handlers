@@ -12,49 +12,47 @@ final class CacheTest extends TestCase
     {
         parent::tearDown();
 
-        $this->factory->clearCache();
+        CarFactory::clearCache();
     }
 
     public function testDiscoveryUsesCache()
     {
         // Reenable caching
-        $config                = config('Handlers');
-        $config->cacheDuration = MINUTE;
+        config('Handlers')->cacheDuration = MINUTE;
 
-        $class = 'Foo\Bar\Baz';
-        cache()->save('handlers-cars', [
-            'bam' => ['id' => 'bam', 'class' => $class],
-        ]);
+        $expected = ['bam' => 'Foo\Bar\Baz'];
+        cache()->save('handlers-cars', $expected);
 
-        $this->factory = new CarFactory($config);
-        $result        = $this->factory->first();
+        $result = CarFactory::findAll();
 
-        $this->assertSame($class, $result); // @phpstan-ignore-line
+        $this->assertSame($expected, $result); // @phpstan-ignore-line
     }
 
     public function testDiscoveryCreatesCache()
     {
         // Reenable caching
-        $config                = config('Handlers');
-        $config->cacheDuration = MINUTE;
+        config('Handlers')->cacheDuration = MINUTE;
 
-        $this->factory = new CarFactory($config);
+        CarFactory::findAll();
 
         $result = cache()->get('handlers-cars');
 
         $this->assertCount(2, $result);
-        $this->assertSame('Tests\Support\Cars\PopCar', $result['pop']['class']);
+        $this->assertSame('Tests\Support\Cars\PopCar', $result['pop']);
     }
 
     public function testDiscoveryIgnoresCache()
     {
-        $expected = 'Tests\Support\Cars\PopCar';
+        $expected = [
+            'pop'    => 'Tests\Support\Cars\PopCar',
+            'widget' => 'Tests\Support\Cars\WidgetCar',
+        ];
 
         cache()->save('handlers-cars', [
-            'Foo\Bar\Baz' => ['name' => 'foobar'],
+            'pop' => 'Foo\Bar\Baz',
         ]);
 
-        $result = $this->factory->first();
+        $result = CarFactory::findAll();
 
         $this->assertSame($expected, $result);
     }
