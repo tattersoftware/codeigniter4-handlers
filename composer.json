@@ -1,7 +1,8 @@
 {
     "name": "tatter/handlers",
-    "type": "library",
     "description": "Handler discovery and management, for CodeIgniter 4",
+    "license": "MIT",
+    "type": "library",
     "keywords": [
         "codeigniter",
         "codeigniter4",
@@ -11,8 +12,6 @@
         "modules",
         "autoload"
     ],
-    "homepage": "https://github.com/tattersoftware/codeigniter4-handlers",
-    "license": "MIT",
     "authors": [
         {
             "name": "Matthew Gatner",
@@ -21,20 +20,16 @@
             "role": "Developer"
         }
     ],
+    "homepage": "https://github.com/tattersoftware/codeigniter4-handlers",
     "require": {
         "php": "^7.4 || ^8.0"
     },
     "require-dev": {
-        "codeigniter4/devkit": "^1.0",
-        "codeigniter4/framework": "^4.1"
+        "codeigniter4/framework": "^4.1",
+        "tatter/tools": "^2.0"
     },
-    "config": {
-        "allow-plugins": {
-            "phpstan/extension-installer": true
-        },
-        "optimize-autoloader": true,
-        "sort-packages": true
-    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Tatter\\Handlers\\": "src"
@@ -48,8 +43,13 @@
             "Tests\\Support\\": "tests/_support"
         }
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
     "scripts": {
         "analyze": "phpstan analyze",
         "ci": [
