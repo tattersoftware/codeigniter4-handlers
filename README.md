@@ -44,7 +44,6 @@ e.g. **app/Widgets/** or **src/Reports**.
 
 In order for them be discovered as handlers your classes need to have a consistent class or
 interface type and supply a unique ID via the class constant `HANDLER_ID`.
-Supply the following static methods then implement `Tatter\Handlers\Interfaces\HandlerInterface`.
 
 **Handlers** will resolve class extensions by using this handler ID, so if you want your
 app to "replace" a handler from another namespace then simply extend the original class and
