@@ -14,6 +14,9 @@ class HandlersCache extends BaseCommand
     protected $description = 'Discovers and caches all handlers';
     protected $usage       = 'handlers:cache';
 
+    /**
+     * @return void
+     */
     public function run(array $params = [])
     {
         // Make sure caching is enabled

@@ -34,12 +34,12 @@ final class CommandsTest extends TestCase
         stream_filter_remove($this->streamFilter);
     }
 
-    protected function getBuffer()
+    protected function getBuffer(): string
     {
         return CITestStreamFilter::$buffer;
     }
 
-    public function testCacheFailsCachingDisabled()
+    public function testCacheFailsCachingDisabled(): void
     {
         config('Handlers')->cacheDuration = null;
 
@@ -48,7 +48,7 @@ final class CommandsTest extends TestCase
         $this->assertStringContainsString('Handler caching is disabled by the Tatter\Handlers Config file', $this->getBuffer());
     }
 
-    public function testCacheCreatesCache()
+    public function testCacheCreatesCache(): void
     {
         command('handlers:cache');
 
@@ -61,7 +61,7 @@ final class CommandsTest extends TestCase
         $this->assertSame('Tests\Support\Cars\PopCar', $result['pop']);
     }
 
-    public function testCacheReportsErrors()
+    public function testCacheReportsErrors(): void
     {
         // Stop ignoring the ErrorFactory
         unset(config('Handlers')->ignoredClasses[1]);
@@ -76,7 +76,7 @@ final class CommandsTest extends TestCase
         $this->assertSame(ErrorFactory::class, $result['error']);
     }
 
-    public function testCacheErrorsNoHandlers()
+    public function testCacheErrorsNoHandlers(): void
     {
         // Ignore all Factories
         config('Handlers')->ignoredClasses = [
@@ -90,7 +90,7 @@ final class CommandsTest extends TestCase
         $this->assertStringContainsString('No factories discovered!', $this->getBuffer());
     }
 
-    public function testClearRemovesCache()
+    public function testClearRemovesCache(): void
     {
         command('handlers:cache');
         $this->assertNotNull(cache()->get('handlers-factories'));
