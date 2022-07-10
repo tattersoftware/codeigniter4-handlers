@@ -10,7 +10,7 @@ use Tests\Support\TestCase;
  */
 final class BaseFactoryTest extends TestCase
 {
-    public function testNoDiscoveryReturnsEmptyArray()
+    public function testNoDiscoveryReturnsEmptyArray(): void
     {
         $factory                      = new class () extends BaseFactory {
             public const HANDLER_PATH = 'Bananas';
@@ -19,7 +19,7 @@ final class BaseFactoryTest extends TestCase
         $this->assertSame([], $factory::findAll());
     }
 
-    public function testGetHandlerClassReturnsClass()
+    public function testGetHandlerClassReturnsClass(): void
     {
         $expected = 'Tests\Support\Cars\WidgetCar';
 
@@ -29,28 +29,28 @@ final class BaseFactoryTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function testGetHandlerClassRequiresPhpExtension()
+    public function testGetHandlerClassRequiresPhpExtension(): void
     {
         $result = CarFactory::getHandlerClass('foo', 'bar');
 
         $this->assertNull($result);
     }
 
-    public function testGetHandlerClassRequiresInterfaces()
+    public function testGetHandlerClassRequiresInterfaces(): void
     {
         $result = CarFactory::getHandlerClass(SUPPORTPATH . 'Cars/NotCar.php', 'Tests\Support');
 
         $this->assertNull($result);
     }
 
-    public function testGetHandlerClassRequiresHandlerInterface()
+    public function testGetHandlerClassRequiresHandlerInterface(): void
     {
         $result = CarFactory::getHandlerClass(SUPPORTPATH . 'Cars/BadCar.php', 'Tests\Support');
 
         $this->assertNull($result);
     }
 
-    public function testGetHandlerClassFails()
+    public function testGetHandlerClassFails(): void
     {
         $file   = realpath(SUPPORTPATH . 'Cars/WidgetCar.php');
         $result = CarFactory::getHandlerClass($file, 'Foo\Bar');
@@ -58,7 +58,7 @@ final class BaseFactoryTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testIgnoresClass()
+    public function testIgnoresClass(): void
     {
         config('Handlers')->ignoredClasses[] = 'Tests\Support\Cars\PopCar';
 
@@ -68,7 +68,7 @@ final class BaseFactoryTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function testCollision()
+    public function testCollision(): void
     {
         // Stop ignoring the collision clas
         config('Handlers')->ignoredClasses = [];
@@ -79,7 +79,7 @@ final class BaseFactoryTest extends TestCase
         CarFactory::findAll();
     }
 
-    public function testFindAll()
+    public function testFindAll(): void
     {
         $expected = [
             'pop'    => 'Tests\Support\Cars\PopCar',
@@ -91,7 +91,7 @@ final class BaseFactoryTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function testFind()
+    public function testFind(): void
     {
         $expected = 'Tests\Support\Cars\PopCar';
 
@@ -100,7 +100,7 @@ final class BaseFactoryTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    public function testFindThrows()
+    public function testFindThrows(): void
     {
         $this->expectException('RuntimeException');
         $this->expectExceptionMessage('Unknown handler "banana" for ' . CarFactory::class);
@@ -108,7 +108,7 @@ final class BaseFactoryTest extends TestCase
         CarFactory::find('banana');
     }
 
-    public function testResetSingle()
+    public function testResetSingle(): void
     {
         CarFactory::findAll();
         FactoryFactory::findAll();
@@ -121,7 +121,7 @@ final class BaseFactoryTest extends TestCase
         $this->assertSame(['Factories'], array_keys($result));
     }
 
-    public function testResetAll()
+    public function testResetAll(): void
     {
         CarFactory::findAll();
         FactoryFactory::findAll();

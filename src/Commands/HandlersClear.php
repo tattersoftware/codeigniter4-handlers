@@ -12,6 +12,9 @@ class HandlersClear extends BaseCommand
     protected $description = 'Clears cached versions of discovered handlers';
     protected $usage       = 'handlers:clear';
 
+    /**
+     * @return void
+     */
     public function run(array $params = [])
     {
         $count = cache()->deleteMatching('handlers-*');

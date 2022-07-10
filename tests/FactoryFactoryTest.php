@@ -9,7 +9,7 @@ use Tests\Support\TestCase;
  */
 final class FactoryFactoryTest extends TestCase
 {
-    public function testDiscovers()
+    public function testDiscovers(): void
     {
         // Discovery is alphabetical by ID
         $expected = [

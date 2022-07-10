@@ -15,7 +15,7 @@ final class CacheTest extends TestCase
         CarFactory::clearCache();
     }
 
-    public function testDiscoveryUsesCache()
+    public function testDiscoveryUsesCache(): void
     {
         // Reenable caching
         config('Handlers')->cacheDuration = MINUTE;
@@ -28,7 +28,7 @@ final class CacheTest extends TestCase
         $this->assertSame($expected, $result); // @phpstan-ignore-line
     }
 
-    public function testDiscoveryCreatesCache()
+    public function testDiscoveryCreatesCache(): void
     {
         // Reenable caching
         config('Handlers')->cacheDuration = MINUTE;
@@ -41,7 +41,7 @@ final class CacheTest extends TestCase
         $this->assertSame('Tests\Support\Cars\PopCar', $result['pop']);
     }
 
-    public function testDiscoveryIgnoresCache()
+    public function testDiscoveryIgnoresCache(): void
     {
         $expected = [
             'pop'    => 'Tests\Support\Cars\PopCar',
